@@ -11,6 +11,13 @@ FetchContent_Declare(SFML
 FetchContent_MakeAvailable(SFML)
 
 add_executable(CMakeSFMLProject src/main.cpp src/textures.cpp)
+
+
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/a+b.png
+        ${CMAKE_CURRENT_BINARY_DIR}/bin COPYONLY)
+
+
 target_link_libraries(CMakeSFMLProject PRIVATE sfml-graphics)
 target_compile_features(CMakeSFMLProject PRIVATE cxx_std_17)
 
