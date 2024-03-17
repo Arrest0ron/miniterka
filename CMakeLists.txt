@@ -14,7 +14,7 @@ add_executable(CMakeSFMLProject src/main.cpp src/textures.cpp)
 
 
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/a+b.png
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/Textures-16.png
         ${CMAKE_CURRENT_BINARY_DIR}/bin COPYONLY)
 
 
