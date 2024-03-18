@@ -51,9 +51,11 @@ int**& RandomWalkTopSmoothed(int**& map, int seed, int minSectionWidth)
         sectionWidth++;
 
         //Work our way from the height down to 0
-        for (int y = lastHeight; y < MAP_HEIGHT; y++)
+        map[lastHeight][x] = 1;
+        map[lastHeight+1][x] = 1;
+        for (int y = lastHeight+2; y < MAP_HEIGHT; y++)
         {
-            map[y][x] = 1;
+            map[y][x] = 2;
         }
     }
     // for ( int i=0;i!=MAP_HEIGHT;i++){
@@ -75,7 +77,7 @@ int main()
 
     // Загрузка тайлсета
     sf::Texture tileset;
-    if (!tileset.loadFromFile("Textures-16.png"))
+    if (!tileset.loadFromFile("textures-4.png"))
     {
         std::cerr << "Failed to load tileset!" << std::endl;
         return -1;
@@ -92,8 +94,6 @@ int main()
         int y = (i / TILESET_X) * tileSize;
         tiles[i].setTexture(tileset);
         tiles[i].setTextureRect(sf::IntRect(x, y, tileSize, tileSize));
-        tiles[0].setColor(sf::Color::White);
-        tiles[1].setColor(sf::Color::Green);
     }
 
     // Тайлмап
