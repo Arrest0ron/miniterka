@@ -3,40 +3,40 @@
 #include <iostream>
 #include <ctime>
 
-const int MAP_HEIGHT = 900/4;
-const int MAP_LENGTH = 900/4;
+const int MAP_HEIGHT = 900;
+const int MAP_LENGTH = 900;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
-const int MIN_SEALEVEL = 900/16-5;
-const int MAX_SEALEVEL = 900/16+5;
+const int MIN_SEALEVEL = 900/4-5;
+const int MAX_SEALEVEL = 900/4+5;
 
 
 int**& RandomWalkTopSmoothed(int**& map, int seed, int minSectionWidth)
 {
-    //Seed our random
+    // Установили генерацию относительно семечка 
     srand(seed);
     std::cout << seed;
     
     int randint = rand();
 
-    //Determine the start position
+    //Определили начальную высоту
     int lastHeight = MIN_SEALEVEL + randint%(MAX_SEALEVEL-MIN_SEALEVEL + 1);
 
     randint = rand();
 
-    //Used to determine which direction to go
+    //Это для направления движения
     int nextMove = 0;
-    //Used to keep track of the current sections width
+    //Длина текущего шага
     int sectionWidth = 0;
 
-    //Work through the array width
+    //проходим по всем X
     for (int x = 0; x < MAP_LENGTH; x++)
     {
-        //Determine the next move
+        //Рандомно определяем куда идти
         nextMove = randint%2;
         randint = rand();
 
-        //Only change the height if we have used the current height more than the minimum required section width
+        //Если длина секции > макс длины секции -> меняем высоту.
         if (nextMove == 0 && lastHeight > 0 && sectionWidth > minSectionWidth)
         {
             lastHeight--;
@@ -47,10 +47,10 @@ int**& RandomWalkTopSmoothed(int**& map, int seed, int minSectionWidth)
             lastHeight++;
             sectionWidth = 0;
         }
-        //Increment the section width
+        //Увеличиваем длину секции
         sectionWidth++;
 
-        //Work our way from the height down to 0
+        //Заполняем все под нашей высотой землей в два слоя и камнем ниже.
         map[lastHeight][x] = 1;
         map[lastHeight+1][x] = 1;
         for (int y = lastHeight+2; y < MAP_HEIGHT; y++)
@@ -58,13 +58,7 @@ int**& RandomWalkTopSmoothed(int**& map, int seed, int minSectionWidth)
             map[y][x] = 2;
         }
     }
-    // for ( int i=0;i!=MAP_HEIGHT;i++){
-    //     for (int j=0;j!=MAP_LENGTH;j++){
-    //         std::cout << map[i][j] << " ";
-    //     }
-    //     std::cout << "\n";
-    // }
-    //Return the modified map
+
     return map;
 }
 
@@ -111,7 +105,11 @@ int main()
     srand(time(0));
     int seed = rand();
     tilemap = RandomWalkTopSmoothed(tilemap,seed,2);
-    // Основной цикл приложения
+    sf::View NewZoom;
+    NewZoom.setSize(1000,1000);
+    window.setView(NewZoom);
+   
+
     while (window.isOpen())
     {
         // Обработка событий
@@ -120,7 +118,19 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            if (event.type == sf::Event::KeyPressed){
+                if (event.key.code == sf::Keyboard::Key::X){
+                    NewZoom.zoom(1.2);
+                    window.setView(NewZoom);
+                }
+                if (event.key.code == sf::Keyboard::Key::Z){
+                    NewZoom.zoom(0.8);
+                    window.setView(NewZoom);
+                }
+                
+            }
         }
+
 
         // Отрисовка тайлмапа
         window.clear();
@@ -133,6 +143,8 @@ int main()
                 window.draw(tiles[tileIndex]);
             }
         }
+
+
         window.display();
     }
     delete tilemap;
