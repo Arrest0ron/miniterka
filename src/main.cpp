@@ -223,10 +223,11 @@ int main()
         WaterLine.append(WaterLineStart);
         WaterLine.append(WaterLineEnd);
         window.draw(WaterLine);
-
+ 
 
         window.display();
-    }\
+    }
+    return 0;
     delete tilemap;
     return 0;
 }

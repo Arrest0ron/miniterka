@@ -2,8 +2,12 @@ build/_deps
 build/.cmake
 build/*.*
 build/CMakeFiles
+
 out
 .cache
 .idea
 .vs
 .vscode
+build/Makefile
+build/Makefile
+build/bin/CMakeSFMLProject.exe
