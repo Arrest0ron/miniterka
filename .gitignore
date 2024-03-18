@@ -1,4 +1,7 @@
-build
+build/_deps
+build/.cmake
+build/*.*
+build/CMakeFiles
 out
 .cache
 .idea

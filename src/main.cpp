@@ -226,7 +226,7 @@ int main()
 
 
         window.display();
-    }
+    }\
     delete tilemap;
     return 0;
 }
