@@ -3,8 +3,8 @@
 #include <iostream>
 #include <ctime>
 
-const int MAP_HEIGHT = 900;
-const int MAP_LENGTH = 900;
+const int MAP_HEIGHT = 1000;
+const int MAP_LENGTH = 1000;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
 const int MIN_SEALEVEL = 900/4-5;
@@ -79,6 +79,7 @@ int main()
 
     // Создание спрайтов для каждого тайла из тайлсета
     sf::Sprite tiles[TILESET_SIZE];
+    
 
     int tileSize = 4; // Размер каждого тайла
 
