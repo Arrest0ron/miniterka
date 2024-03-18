@@ -79,6 +79,7 @@ int main()
 
     // Создание спрайтов для каждого тайла из тайлсета
     sf::Sprite tiles[TILESET_SIZE];
+    
 
     int tileSize = 4; // Размер каждого тайла
 
