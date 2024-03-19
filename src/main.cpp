@@ -4,8 +4,8 @@
 #include <ctime>
 #include <cmath>
 
-const int MAP_HEIGHT = 250;
-const int MAP_LENGTH = 500;
+const int MAP_HEIGHT = 100;
+const int MAP_LENGTH = 100;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
 const int MIN_SEALEVEL = MAP_HEIGHT/2;
@@ -38,6 +38,46 @@ int**& WaterFill(int**& map)
     }
     return map;
 
+}
+
+int**& WaterClean(int**&map ){
+    for (int x=2;x!=MAP_LENGTH;x++)
+    {
+        int maxH = GetMaxHight(map,x);
+        if (map[maxH][x] == 3)
+        {
+            bool flag = 1;
+            for (int counter =0;counter!=3;counter++)
+            {
+                if (map[maxH][x+counter] != 3)
+                {
+                    flag = 0;
+                    break;
+                }
+            }
+
+
+            if (!flag)
+            {
+                for (int counter =0;counter!=3;counter++)
+                {
+
+            
+                    for (int y=0;y!=MAP_HEIGHT;y++)
+                    {
+                        if (map[y][x+counter] == 3)
+                        {
+                            map[y][x+counter] =0;
+                        }
+                    }
+                    
+                    
+                    
+                }
+            }
+        }
+    }
+    return map;
 }
 
 // bool CheckForPoolSize(int**&map, int x, int y){
@@ -150,7 +190,7 @@ int main()
     // }
     sf::View NewZoom;
     if (PLAYABLE){
-        NewZoom.setSize(160,90);
+        // NewZoom.setSize(160,90);
     }
     NewZoom.setSize(MAP_HEIGHT * tileSize, tileSize*MAP_HEIGHT);
     NewZoom.setCenter(sf::Vector2f(MAP_LENGTH/2*tileSize,MAP_HEIGHT/2*tileSize));
@@ -173,12 +213,12 @@ int main()
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
         {
-            NewZoom.zoom(1.2);
+            NewZoom.zoom(1.05);
             window.setView(NewZoom);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
         {
-            NewZoom.zoom(0.8);
+            NewZoom.zoom(0.95);
             window.setView(NewZoom);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -213,8 +253,13 @@ int main()
                 int tileIndex = tilemap[y][x];
                 tiles[tileIndex].setPosition(x * tileSize, y * tileSize);
                 window.draw(tiles[tileIndex]);
+                // std::cout << tilemap[y][x] << " ";
             }
+            // std::cout << "\n";
         }
+        // std::cout << "\n";
+        
+        // tilemap = WaterClean(tilemap);
         sf::VertexArray WaterLine(sf::Lines);
         sf::Vertex WaterLineStart = (sf::Vector2f(0.f,MIN_SEALEVEL*tileSize));
         sf::Vertex WaterLineEnd = (sf::Vector2f(MAP_LENGTH*tileSize,MIN_SEALEVEL*tileSize));
