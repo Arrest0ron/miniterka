@@ -8,12 +8,19 @@ const int MAP_HEIGHT = 100;
 const int MAP_LENGTH = 100;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
-const int MIN_SEALEVEL = MAP_HEIGHT/2;
-const int MAX_SEALEVEL = MAP_HEIGHT/2-MAP_HEIGHT*0.05;
+const int MIN_SEALEVEL = MAP_HEIGHT/2-5;
+const int MAX_SEALEVEL = MAP_HEIGHT/2+MAP_HEIGHT*0.05;
 const bool PLAYABLE = true;
 
 int GetMaxHight(int**& map,int x)
 {
+    if (x >= MAP_LENGTH){
+        throw std::runtime_error("X OVERFLOW");
+    }
+    if (x < 0){
+        throw std::runtime_error("X UNDER 0");
+    }
+    
     for (int y=0;y!=MAP_HEIGHT;y++)
     {
         if (map[y][x] != 0)
@@ -21,7 +28,9 @@ int GetMaxHight(int**& map,int x)
             return y;
         }
     }
+    return MAP_HEIGHT-1;
 }
+
 int**& WaterFill(int**& map)
 {
     for (int x=0;x!=MAP_LENGTH;x++)
@@ -34,51 +43,59 @@ int**& WaterFill(int**& map)
                 map[y][x] = 3;
             }
         }
+        std::cout << map[GetMaxHight(map,x)][x];
         
     }
+    
     return map;
 
 }
-
-int**& WaterClean(int**&map ){
-    for (int x=2;x!=MAP_LENGTH;x++)
-    {
-        int maxH = GetMaxHight(map,x);
-        if (map[maxH][x] == 3)
+int CalculateSurfaceChain(int**& map,int x){
+    int WaterCounter{};
+    for (int i = x;i!=MAP_LENGTH;i++)
         {
-            bool flag = 1;
-            for (int counter =0;counter!=3;counter++)
+            if (map[GetMaxHight(map,i)][i] == 3)
             {
-                if (map[maxH][x+counter] != 3)
-                {
-                    flag = 0;
-                    break;
-                }
-            }
-
-
-            if (!flag)
-            {
-                for (int counter =0;counter!=3;counter++)
-                {
-
+                WaterCounter ++;
+            } 
             
-                    for (int y=0;y!=MAP_HEIGHT;y++)
-                    {
-                        if (map[y][x+counter] == 3)
-                        {
-                            map[y][x+counter] =0;
-                        }
-                    }
-                    
-                    
-                    
-                }
+            else{
+                break;
             }
         }
+    return WaterCounter;
+}
+int**& WaterClean(int**& map )
+{
+    for (int x=0;x!=MAP_LENGTH;x++)
+    {
+        int CurrentHight = GetMaxHight(map,x);
+        int CurrentTopTile = map[CurrentHight][x];
+        int WaterChain = CalculateSurfaceChain(map,x);
+        if (CurrentTopTile !=3){continue;}
+        if (WaterChain <= 5)
+        {
+
+            for (int i =x;i!=x+WaterChain;i++)
+            {
+                for (int y = GetMaxHight(map,i);map[y][i]!=1;y++)
+                {
+                    if (map[y][i] == 3)
+                    {
+                        map[y][i] = 0;
+                    }
+                }
+
+            }
+            
+        }
+        x += WaterChain;
     }
     return map;
+
+    
 }
+
 
 // bool CheckForPoolSize(int**&map, int x, int y){
 //     if (x > MAP_LENGTH-4){
@@ -94,7 +111,7 @@ int**& RandomWalkTopSmoothed(int**& map, int seed, int minSectionWidth)
     int randint = rand();
 
     //Определили начальную высоту
-    int lastHeight = MIN_SEALEVEL - randint%(-MAX_SEALEVEL+MIN_SEALEVEL);
+    int lastHeight = MIN_SEALEVEL + randint%(-MAX_SEALEVEL+MIN_SEALEVEL);
 
     randint = rand();
 
@@ -125,7 +142,7 @@ int**& RandomWalkTopSmoothed(int**& map, int seed, int minSectionWidth)
         sectionWidth++;
 
         //Заполняем все под нашей высотой землей в два слоя и камнем ниже.
-        std::cout << lastHeight << " ";
+        // std::cout << lastHeight << " ";
         map[lastHeight][x] = 1;
         if (lastHeight + 1 < MAP_HEIGHT){
             map[lastHeight+1][x] = 1;
@@ -142,6 +159,7 @@ int**& RandomWalkTopSmoothed(int**& map, int seed, int minSectionWidth)
 int main()
 {
     // Создание окна
+    int GLOBAL_SEED = time(0);
 
 
     sf::RenderWindow window(sf::VideoMode(600, 600), "Tilemap");
@@ -180,11 +198,12 @@ int main()
             tilemap[i][j] = 0;
         }
     }
-    srand(time(0));
+    srand(GLOBAL_SEED);
     int seed = rand();
 
     tilemap = RandomWalkTopSmoothed(tilemap,seed,2);
     tilemap = WaterFill(tilemap);
+    tilemap = WaterClean(tilemap);
     // for ( int i =0;i<MAP_LENGTH;i++){
     //     std::cout << GetMaxHight(tilemap,i) << " ";
     // }
@@ -248,6 +267,7 @@ int main()
         window.clear();
         for (int y = 0; y < MAP_HEIGHT; ++y)
         {
+            
             for (int x = 0; x < MAP_LENGTH; ++x)
             {
                 int tileIndex = tilemap[y][x];
@@ -259,7 +279,7 @@ int main()
         }
         // std::cout << "\n";
         
-        // tilemap = WaterClean(tilemap);
+        
         sf::VertexArray WaterLine(sf::Lines);
         sf::Vertex WaterLineStart = (sf::Vector2f(0.f,MIN_SEALEVEL*tileSize));
         sf::Vertex WaterLineEnd = (sf::Vector2f(MAP_LENGTH*tileSize,MIN_SEALEVEL*tileSize));
@@ -268,8 +288,12 @@ int main()
         WaterLine.append(WaterLineStart);
         WaterLine.append(WaterLineEnd);
         window.draw(WaterLine);
- 
-
+        sf::Text seedText;
+        std::string seedString = std::to_string(GLOBAL_SEED);
+        seedText.setString(seedString);
+        seedText.setPosition(0,0);
+        seedText.setCharacterSize(90);
+        window.draw(seedText);
         window.display();
     }
     return 0;
