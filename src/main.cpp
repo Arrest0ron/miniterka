@@ -4,15 +4,18 @@
 #include <ctime>
 #include <cmath>
 
-const int MAP_HEIGHT = 100;
-const int MAP_LENGTH = 100;
+const int MAP_HEIGHT = 200;
+const int MAP_LENGTH = 600;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
-const int MIN_SEALEVEL = MAP_HEIGHT/2-5;
+const int MIN_SEALEVEL = MAP_HEIGHT/2;
 const int MAX_SEALEVEL = MAP_HEIGHT/2+MAP_HEIGHT*0.05;
+const int SEALEVEL = (MIN_SEALEVEL + MAX_SEALEVEL) / 2;
+const int SECTIONWIDTH = 6;
+
 const bool PLAYABLE = true;
 
-int GetMaxHight(int**& map,int x)
+int GetMaxHight(int**& map,int x) 
 {
     if (x >= MAP_LENGTH){
         throw std::runtime_error("X OVERFLOW");
@@ -20,7 +23,7 @@ int GetMaxHight(int**& map,int x)
     if (x < 0){
         throw std::runtime_error("X UNDER 0");
     }
-    
+
     for (int y=0;y!=MAP_HEIGHT;y++)
     {
         if (map[y][x] != 0)
@@ -31,25 +34,21 @@ int GetMaxHight(int**& map,int x)
     return MAP_HEIGHT-1;
 }
 
-int**& WaterFill(int**& map)
+void WaterFill(int**& map)
 {
     for (int x=0;x!=MAP_LENGTH;x++)
     {
         int maxH = GetMaxHight(map,x);
-        if (maxH > MIN_SEALEVEL)
+        if (maxH > SEALEVEL)
         {
-            for(int y=MIN_SEALEVEL;y!=maxH;y++)
+            for(int y=SEALEVEL;y!=maxH;y++)
             {
                 map[y][x] = 3;
             }
         }
-        std::cout << map[GetMaxHight(map,x)][x];
-        
     }
-    
-    return map;
-
 }
+
 int CalculateSurfaceChain(int**& map,int x){
     int WaterCounter{};
     for (int i = x;i!=MAP_LENGTH;i++)
@@ -65,15 +64,17 @@ int CalculateSurfaceChain(int**& map,int x){
         }
     return WaterCounter;
 }
-int**& WaterClean(int**& map )
+void WaterClean(int**& map, int MinWaterChainSize = 10)
 {
     for (int x=0;x!=MAP_LENGTH;x++)
     {
+ 
         int CurrentHight = GetMaxHight(map,x);
         int CurrentTopTile = map[CurrentHight][x];
-        int WaterChain = CalculateSurfaceChain(map,x);
+        
         if (CurrentTopTile !=3){continue;}
-        if (WaterChain <= 5)
+        int WaterChain = CalculateSurfaceChain(map,x);
+        if (WaterChain < MinWaterChainSize)
         {
 
             for (int i =x;i!=x+WaterChain;i++)
@@ -89,31 +90,19 @@ int**& WaterClean(int**& map )
             }
             
         }
-        x += WaterChain;
+        x = std::min(x+WaterChain,MAP_LENGTH-1);
     }
-    return map;
-
-    
 }
 
-
-// bool CheckForPoolSize(int**&map, int x, int y){
-//     if (x > MAP_LENGTH-4){
-//         max
-//     }
-// }
-int**& RandomWalkTopSmoothed(int**& map, int seed, int minSectionWidth)
+int**& RandomWalkTopSmoothed(int**& map, int minSectionWidth)
 {
-    // Установили генерацию относительно семечка 
-    srand(seed);
+
     // std::cout << seed;
     
     int randint = rand();
 
     //Определили начальную высоту
-    int lastHeight = MIN_SEALEVEL + randint%(-MAX_SEALEVEL+MIN_SEALEVEL);
-
-    randint = rand();
+    int lastHeight = SEALEVEL-SEALEVEL*0.03;
 
     //Это для направления движения
     int nextMove = 0;
@@ -142,7 +131,7 @@ int**& RandomWalkTopSmoothed(int**& map, int seed, int minSectionWidth)
         sectionWidth++;
 
         //Заполняем все под нашей высотой землей в два слоя и камнем ниже.
-        // std::cout << lastHeight << " ";
+    
         map[lastHeight][x] = 1;
         if (lastHeight + 1 < MAP_HEIGHT){
             map[lastHeight+1][x] = 1;
@@ -158,10 +147,20 @@ int**& RandomWalkTopSmoothed(int**& map, int seed, int minSectionWidth)
 
 int main()
 {
-    // Создание окна
+
+
+    
+    
+    // Установка семечка генерации как ключа для генерации всех случайных переменных.
     int GLOBAL_SEED = time(0);
+    srand(GLOBAL_SEED);
 
 
+    
+    // GLOBAL_SEED = 1710959590;
+    std::cout << GLOBAL_SEED << "\n";
+
+    // Создание окна
     sf::RenderWindow window(sf::VideoMode(600, 600), "Tilemap");
 
     // Загрузка тайлсета
@@ -178,6 +177,8 @@ int main()
 
     int tileSize = 4; // Размер каждого тайла
 
+
+    // Установка текстур с тайлсета в тайлы
     for (int i = 0; i < TILESET_SIZE; ++i)
     {
         int x = (i % TILESET_X) * tileSize;
@@ -186,7 +187,7 @@ int main()
         tiles[i].setTextureRect(sf::IntRect(x, y, tileSize, tileSize));
     }
 
-    // Тайлмап
+    // Создание тайлмапа, заполнение пустотой
 
     int** tilemap = new int*[MAP_HEIGHT];
     for (int i=0;i!=MAP_HEIGHT;i++){
@@ -198,12 +199,23 @@ int main()
             tilemap[i][j] = 0;
         }
     }
-    srand(GLOBAL_SEED);
-    int seed = rand();
+    
 
-    tilemap = RandomWalkTopSmoothed(tilemap,seed,2);
-    tilemap = WaterFill(tilemap);
-    tilemap = WaterClean(tilemap);
+    
+
+    
+
+
+    try
+    {
+        RandomWalkTopSmoothed(tilemap,SECTIONWIDTH);
+        WaterFill(tilemap);
+        WaterClean(tilemap,7);
+    }
+    catch(std::runtime_error err){
+        std::cout << "\n" << err.what() << "\n";
+    }
+    
     // for ( int i =0;i<MAP_LENGTH;i++){
     //     std::cout << GetMaxHight(tilemap,i) << " ";
     // }
@@ -216,6 +228,19 @@ int main()
     window.setView(NewZoom);
    
     sf::Clock clock;
+
+    sf::VertexArray WaterLine(sf::Lines);
+    sf::Vertex WaterLineStart = (sf::Vector2f(0.f,SEALEVEL*tileSize));
+    sf::Vertex WaterLineEnd = (sf::Vector2f(MAP_LENGTH*tileSize,SEALEVEL*tileSize));
+    WaterLineStart.color = sf::Color::Red;
+    WaterLineEnd.color = sf::Color::Red;
+    WaterLine.append(WaterLineStart);
+    WaterLine.append(WaterLineEnd);
+
+
+
+
+
     while (window.isOpen())
     {
         sf::Time dt = clock.restart();
@@ -273,30 +298,32 @@ int main()
                 int tileIndex = tilemap[y][x];
                 tiles[tileIndex].setPosition(x * tileSize, y * tileSize);
                 window.draw(tiles[tileIndex]);
-                // std::cout << tilemap[y][x] << " ";
+
             }
-            // std::cout << "\n";
+
         }
-        // std::cout << "\n";
         
         
-        sf::VertexArray WaterLine(sf::Lines);
-        sf::Vertex WaterLineStart = (sf::Vector2f(0.f,MIN_SEALEVEL*tileSize));
-        sf::Vertex WaterLineEnd = (sf::Vector2f(MAP_LENGTH*tileSize,MIN_SEALEVEL*tileSize));
-        WaterLineStart.color = sf::Color::Red;
-        WaterLineEnd.color = sf::Color::Red;
-        WaterLine.append(WaterLineStart);
-        WaterLine.append(WaterLineEnd);
+    sf::Font font;
+    if (!font.loadFromFile("arial.ttf")) {
+        // Ошибка загрузки шрифта
+        return -1;
+    }
+    
+    sf::Text text;
+    text.setFont(font); // Устанавливаем шрифт
+    text.setString(std::to_string(GLOBAL_SEED)); // Устанавливаем строку текста
+    text.setCharacterSize(24); // Устанавливаем размер шрифта
+    text.setPosition(MAP_LENGTH/2,0); // Устанавливаем положение
+    text.setFillColor(sf::Color::Black); // Устанавливаем цвет текста
+
+        // Рисуем красную линию, обозначающую уровень моря
         window.draw(WaterLine);
-        sf::Text seedText;
-        std::string seedString = std::to_string(GLOBAL_SEED);
-        seedText.setString(seedString);
-        seedText.setPosition(0,0);
-        seedText.setCharacterSize(90);
-        window.draw(seedText);
+        
+        window.draw(text);
         window.display();
     }
-    return 0;
+
     delete tilemap;
     return 0;
 }

@@ -2,7 +2,6 @@ build/_deps
 build/.cmake
 build/*.*
 build/CMakeFiles
-
 out
 .cache
 .idea
@@ -12,3 +11,4 @@ build/Makefile
 build/Makefile
 build/bin/CMakeSFMLProject.exe
 build/Makefile
+build/bin/CMakeSFMLProject.exe
