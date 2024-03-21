@@ -2,6 +2,8 @@
 #include "SFML/Window.hpp"
 #include <iostream>
 #include <cmath>
+#include <ctime>
+
 
 void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT, int SEALEVEL);
 double perlin(int x, int y);

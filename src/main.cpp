@@ -1,9 +1,7 @@
 
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include "textures.h"
-#include <ctime>
-#include <cmath>
+
 
 const int MAP_HEIGHT = 200;
 const int MAP_LENGTH = 400;
@@ -70,42 +68,44 @@ int CalculateSurfaceChain(int**& map,int x){
 }
 
 void TickWater(int **& map){
-    for(int y=0; y !=MAP_HEIGHT-1;y++)
+    for(int y=0; y !=MAP_HEIGHT;y++)
     {
-        for (int x =1; x!= MAP_LENGTH-1; x++)
+        for (int x =0; x!= MAP_LENGTH; x++)
         {
-            if (map[y][x] == 3 && map[y+1][x] == 0)
+            if (map[y][x] == 3 || map[y][x] == 4)
             {
-                std::swap(map[y][x], map[y+1][x]);
-            }
-            switch (rand()%4)
-            {
-            case 0:
-                if (map[y][x] == 3 && map[y][x-1] == 0)
-                {
-                    std::swap(map[y][x], map[y][x-1]);
+                if (x <= MAP_LENGTH / 2){
+                    map[y][x] = 4;
                 }
-                break;
-            case 1:            
-                if (map[y][x] == 3 && map[y][x+1] == 0)
+                else
                 {
-                    std::swap(map[y][x], map[y][x+1]);
+                    map[y][x] = 3;
                 }
-                break;
-            // case :            
-            //     if (map[y][x] == 3 && map[y][x+1] == 0)
-            //     {
-            //         std::swap(map[y][x], map[y][x+1]);
-            //     }
-            //     break;
-            // case 3:            
-            //     if (map[y][x] == 3 && map[y][x+1] == 0)
-            //     {
-            //         std::swap(map[y][x], map[y][x+1]);
-            //     }
-            //     break;
-            default:
-                break;
+
+
+
+
+                if (y < MAP_HEIGHT-1 && map[y+1][x] == 0)
+                {
+                    std::swap(map[y][x], map[y+1][x]);
+                }
+                switch (rand()%2)
+                {
+                case 0:
+                    if (x > 0 && map[y][x-1] == 0)
+                    {
+                        std::swap(map[y][x], map[y][x-1]);
+                    }
+                    break;
+                case 1:            
+                    if (x < MAP_LENGTH && map[y][x+1] == 0)
+                    {
+                        std::swap(map[y][x], map[y][x+1]);
+                    }
+                    break;
+                default:
+                    break;
+                }
             }
         }
     }
@@ -269,9 +269,6 @@ int main()
         std::cout << "\n" << err.what() << "\n";
     }
     
-    // for ( int i =0;i<MAP_LENGTH;i++){
-    //     std::cout << GetMaxHight(tilemap,i) << " ";
-    // }
     sf::View NewZoom;
     if (PLAYABLE){
         // NewZoom.setSize(160,90);
