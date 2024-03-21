@@ -15,6 +15,7 @@ const int SECTIONWIDTH = 6;
 
 const bool PLAYABLE = true;
 
+// Возвращает максимальный y на заданном x, на котором не пусто.
 int GetMaxHight(int**& map,int x) 
 {
     if (x >= MAP_LENGTH){
@@ -34,6 +35,7 @@ int GetMaxHight(int**& map,int x)
     return MAP_HEIGHT-1;
 }
 
+//Наполняет водой всю пустоту ниже SEALEVEL
 void WaterFill(int**& map)
 {
     for (int x=0;x!=MAP_LENGTH;x++)
@@ -49,6 +51,8 @@ void WaterFill(int**& map)
     }
 }
 
+
+// Считает длину цепочки воды
 int CalculateSurfaceChain(int**& map,int x){
     int WaterCounter{};
     for (int i = x;i!=MAP_LENGTH;i++)
@@ -64,6 +68,7 @@ int CalculateSurfaceChain(int**& map,int x){
         }
     return WaterCounter;
 }
+
 void WaterClean(int**& map, int MinWaterChainSize = 10)
 {
     for (int x=0;x!=MAP_LENGTH;x++)
@@ -93,6 +98,9 @@ void WaterClean(int**& map, int MinWaterChainSize = 10)
         x = std::min(x+WaterChain,MAP_LENGTH-1);
     }
 }
+
+
+// RandomWalk для первичной генерации линии поверхности
 
 int**& RandomWalkTopSmoothed(int**& map, int minSectionWidth)
 {
@@ -147,16 +155,10 @@ int**& RandomWalkTopSmoothed(int**& map, int minSectionWidth)
 
 int main()
 {
-
-
-    
-    
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
     int GLOBAL_SEED = time(0);
     srand(GLOBAL_SEED);
 
-
-    
     // GLOBAL_SEED = 1710959590;
     std::cout << GLOBAL_SEED << "\n";
 
@@ -201,15 +203,10 @@ int main()
     }
     
 
-    
-
-    
-
-
     try
     {
-        RandomWalkTopSmoothed(tilemap,SECTIONWIDTH);
-        WaterFill(tilemap);
+        RandomWalkTopSmoothed(tilemap,SECTIONWIDTH); 
+        WaterFill(tilemap);                          
         WaterClean(tilemap,7);
     }
     catch(std::runtime_error err){
@@ -227,8 +224,12 @@ int main()
     NewZoom.setCenter(sf::Vector2f(MAP_LENGTH/2*tileSize,MAP_HEIGHT/2*tileSize));
     window.setView(NewZoom);
    
+
+    // Замер времени для гладкого перемещения
     sf::Clock clock;
 
+    
+    // Линия уровня воды.
     sf::VertexArray WaterLine(sf::Lines);
     sf::Vertex WaterLineStart = (sf::Vector2f(0.f,SEALEVEL*tileSize));
     sf::Vertex WaterLineEnd = (sf::Vector2f(MAP_LENGTH*tileSize,SEALEVEL*tileSize));
@@ -240,21 +241,27 @@ int main()
 
 
 
-
+    // Основной цикл окна
     while (window.isOpen())
     {
+        // Получаем время прошлого цикла
         sf::Time dt = clock.restart();
         float dtAsSeconds = dt.asSeconds();
-        // Обработка событий
-        sf::Event event;
+
+        // Скорость движения относительно времени 
         float movement = 250.0f * dtAsSeconds;
 
-
+        // Обработка событий
+        sf::Event event;
+        
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
                 window.close();
         }
+
+        // Нажатия клавиш
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
         {
             NewZoom.zoom(1.05);
@@ -304,6 +311,7 @@ int main()
         }
         
         
+    // Загружаем шрифт
     sf::Font font;
     if (!font.loadFromFile("arial.ttf")) {
         // Ошибка загрузки шрифта
@@ -316,12 +324,10 @@ int main()
     text.setCharacterSize(24); // Устанавливаем размер шрифта
     text.setPosition(MAP_LENGTH/2,0); // Устанавливаем положение
     text.setFillColor(sf::Color::Black); // Устанавливаем цвет текста
-
-        // Рисуем красную линию, обозначающую уровень моря
-        window.draw(WaterLine);
-        
-        window.draw(text);
-        window.display();
+    
+    window.draw(WaterLine);
+    window.draw(text);
+    window.display();
     }
 
     delete tilemap;
