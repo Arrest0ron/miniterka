@@ -52,7 +52,6 @@ void WaterFill(int**& map)
     }
 }
 
-
 // Считает длину цепочки воды
 int CalculateSurfaceChain(int**& map,int x){
     int WaterCounter{};
@@ -70,6 +69,7 @@ int CalculateSurfaceChain(int**& map,int x){
     return WaterCounter;
 }
 
+// Убирает слишком маленькие зоны наполнения водой.
 void WaterClean(int**& map, int MinWaterChainSize = 10)
 {
     for (int x=0;x!=MAP_LENGTH;x++)
@@ -100,9 +100,7 @@ void WaterClean(int**& map, int MinWaterChainSize = 10)
     }
 }
 
-
 // RandomWalk для первичной генерации линии поверхности
-
 int**& RandomWalkTopSmoothed(int**& map, int minSectionWidth)
 {
 
@@ -181,6 +179,17 @@ int main()
     int tileSize = 4; // Размер каждого тайла
 
 
+    // Загружаем шрифт
+    sf::Font font;
+    if (!font.loadFromFile("arial.ttf")) {
+        // Ошибка загрузки шрифта
+        return -1;
+    }
+
+    // Отрисовка цифр вместо тайлов. (Внимание! разбивает на группы 2 на 2 блока, и рисует цифру верхнего левого из них. Не точно!)
+    int DebugNumMode = 0;
+
+
     // Установка текстур с тайлсета в тайлы
     for (int i = 0; i < TILESET_SIZE; ++i)
     {
@@ -240,6 +249,15 @@ int main()
     WaterLine.append(WaterLineStart);
     WaterLine.append(WaterLineEnd);
 
+    // Текст с ключом генерации мира
+
+    sf::Text SeedText;
+    SeedText.setFont(font); // Устанавливаем шрифт
+    SeedText.setString(std::to_string(GLOBAL_SEED)); // Устанавливаем строку текста
+    SeedText.setCharacterSize(24); // Устанавливаем размер шрифта
+    SeedText.setPosition(MAP_LENGTH/2,0); // Устанавливаем положение
+    SeedText.setFillColor(sf::Color::Black); // Устанавливаем цвет текста
+
 
 
 
@@ -260,6 +278,10 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            if (event.key.scancode == sf::Keyboard::Scan::Escape){
+                window.clear();
+                DebugNumMode = 1;
+            }
         }
 
         // Нажатия клавиш
@@ -297,38 +319,49 @@ int main()
         
 
 
+
         // Отрисовка тайлмапа
         window.clear();
+
         for (int y = 0; y < MAP_HEIGHT; ++y)
-        {
-            
+        {  
             for (int x = 0; x < MAP_LENGTH; ++x)
             {
+
+                // Получаем число внутри элемента тайлмапа, обозначающее номер нужной текстурки
                 int tileIndex = tilemap[y][x];
+
+                // Для режима с числами вместо тайлов
+                if (DebugNumMode)
+                {   if (x%4 ==0 && y%4 ==0)
+                    {
+                    sf::Text DebugNum;
+                    DebugNum.setFont(font);
+                    DebugNum.setCharacterSize(16);
+                    DebugNum.setPosition(x * tileSize, y * tileSize);
+                    DebugNum.setString(std::to_string(tileIndex));
+                    DebugNum.setFillColor(sf::Color::White);
+                    window.draw(DebugNum);
+                    }
+                    continue;
+                }       
+
+                // Отрисовка тайлов
+
                 tiles[tileIndex].setPosition(x * tileSize, y * tileSize);
                 window.draw(tiles[tileIndex]);
-
             }
-
         }
         
         
-    // Загружаем шрифт
-    sf::Font font;
-    if (!font.loadFromFile("arial.ttf")) {
-        // Ошибка загрузки шрифта
-        return -1;
-    }
-    
-    sf::Text text;
-    text.setFont(font); // Устанавливаем шрифт
-    text.setString(std::to_string(GLOBAL_SEED)); // Устанавливаем строку текста
-    text.setCharacterSize(24); // Устанавливаем размер шрифта
-    text.setPosition(MAP_LENGTH/2,0); // Устанавливаем положение
-    text.setFillColor(sf::Color::Black); // Устанавливаем цвет текста
+
+
+    // Вывод ключа генерации 
 
     window.draw(WaterLine);
-    window.draw(text);
+
+    
+    window.draw(SeedText);
     window.display();
     }
 
