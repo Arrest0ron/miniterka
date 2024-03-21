@@ -209,7 +209,6 @@ int main()
         RandomWalkTopSmoothed(tilemap,SECTIONWIDTH); 
         WaterFill(tilemap);                          
         WaterClean(tilemap,7);
-        applyPerlinNoiseInsideStones(tilemap, MAP_LENGTH, MAP_HEIGHT);
     }
     catch(std::runtime_error err){
         std::cout << "\n" << err.what() << "\n";
@@ -326,7 +325,7 @@ int main()
     text.setCharacterSize(24); // Устанавливаем размер шрифта
     text.setPosition(MAP_LENGTH/2,0); // Устанавливаем положение
     text.setFillColor(sf::Color::Black); // Устанавливаем цвет текста
-    
+
     window.draw(WaterLine);
     window.draw(text);
     window.display();
