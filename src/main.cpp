@@ -3,8 +3,8 @@
 #include "textures.h"
 
 
-const int MAP_HEIGHT = 200;
-const int MAP_LENGTH = 400;
+const int MAP_HEIGHT = 100;
+const int MAP_LENGTH = 300;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
 const int MIN_SEALEVEL = MAP_HEIGHT/2;
@@ -44,7 +44,7 @@ void WaterFill(int**& map)
         {
             for(int y=SEALEVEL;y!=maxH;y++)
             {
-                map[y][x] = 3;
+                map[y][x] = 4;
             }
         }
     }
@@ -72,14 +72,14 @@ void TickWater(int **& map){
     {
         for (int x =0; x!= MAP_LENGTH; x++)
         {
-            if (map[y][x] == 3 || map[y][x] == 4)
+            if (map[y][x] == 4 || map[y][x] == 5)
             {
-                if (x <= MAP_LENGTH / 2){
+                if (y < SEALEVEL){
                     map[y][x] = 4;
                 }
                 else
                 {
-                    map[y][x] = 3;
+                    map[y][x] = 5;
                 }
 
 
@@ -119,7 +119,7 @@ void WaterClean(int**& map, int MinWaterChainSize = 10)
         int CurrentHight = GetMaxHight(map,x);
         int CurrentTopTile = map[CurrentHight][x];
         
-        if (CurrentTopTile !=3){continue;}
+        if (CurrentTopTile !=4){continue;}
         int WaterChain = CalculateSurfaceChain(map,x);
         if (WaterChain < MinWaterChainSize)
         {
@@ -183,11 +183,14 @@ int**& RandomWalkTopSmoothed(int**& map, int minSectionWidth)
     
         map[lastHeight][x] = 1;
         if (lastHeight + 1 < MAP_HEIGHT){
-            map[lastHeight+1][x] = 1;
+            map[lastHeight+1][x] = 2;
+        }
+        if (lastHeight + 2 < MAP_HEIGHT){
+            map[lastHeight+1][x] = 3;
         }
         for (int y = lastHeight+2; y < MAP_HEIGHT; y++)
         {
-            map[y][x] = 2;
+            map[y][x] = 6;
         }
     }
 
@@ -218,7 +221,7 @@ int main()
     sf::Sprite tiles[TILESET_SIZE];
     
 
-    int tileSize = 4; // Размер каждого тайла
+    int tileSize = 16; // Размер каждого тайла
 
 
     // Загружаем шрифт
@@ -311,7 +314,7 @@ int main()
         float dtAsSeconds = dt.asSeconds();
 
         // Скорость движения относительно времени 
-        float movement = 250.0f * dtAsSeconds;
+        float movement = 250.0f * dtAsSeconds * tileSize/2;
 
         // Обработка событий
         sf::Event event;
@@ -334,12 +337,12 @@ int main()
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
         {
-            NewZoom.zoom(1.05);
+            NewZoom.zoom(1.08);
             window.setView(NewZoom);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
         {
-            NewZoom.zoom(0.95);
+            NewZoom.zoom(0.92);
             window.setView(NewZoom);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))

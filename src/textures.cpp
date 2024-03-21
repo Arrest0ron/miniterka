@@ -12,37 +12,36 @@ void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT, in
 {
     double porog = 0.1; // пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
     std::cout.precision(2);
-    int PERLINKEY = rand()%100000;
+    int PERLINKEY_X = rand()%100000;
+    int PERLINKEY_Y = rand()%100000;
     for (int y = 0; y < MAP_HEIGHT; ++y) 
     {
         for (int x = 0; x < MAP_LENGTH; ++x) 
         {
             // std::cout << perlinNoise(x, y) << " ";
             float diff = pow((static_cast<float>(y)/static_cast<float>(SEALEVEL))- 1 ,4);
-            float noise = interpolatedNoise((x)/5.f+ PERLINKEY,y/5.f);
+            float noise = interpolatedNoise((x)/5.f+ PERLINKEY_X,y/5.f+PERLINKEY_Y);
             
 
 
-            if ((noise+diff>= porog) && (map[y][x] == 2) && (y > SEALEVEL))
+            if ((noise+diff>= porog) && (map[y][x] == 6) && (y > SEALEVEL))
             {
                 // double noiseValue = perlin(x, y); // для шума Перлина
                 // std::cout << noiseValue << " ";
 
-                int k = rand() % 4; // тут я выебываюсь просто
-                if(k == 1)
+                int WaterRand = rand() % 2; // тут я выебываюсь просто
+                if (WaterRand)
                 {
-                    k--;
+                    map[y][x] = 4;
                 }
-                if(k == 2)
+                else
                 {
-                    k++;
+                    map[y][x] = 0;
                 }
 
-                map[y][x] = k; // меняем на другую текстурку
 
             }
         }
-        std::cout << "\n";
     }
 }
 
