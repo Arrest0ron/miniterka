@@ -27,7 +27,7 @@ void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT, in
                 // double noiseValue = perlin(x, y); // для шума Перлина
                 // std::cout << noiseValue << " ";
 
-                int k = (x * y) % 4; // тут я выебываюсь просто
+                int k = rand() % 4; // тут я выебываюсь просто
                 if(k == 1)
                 {
                     k--;
