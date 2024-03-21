@@ -19,7 +19,7 @@ void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT)
             {
                 double noiseValue = perlinNoise(x, y); // для шума Перлина
 
-                int k = (x * y) % 4; // тут я выебываюсь просто
+                int k = rand() % 4; // тут я выебываюсь просто
                 if(k == 1)
                 {
                     k--;
