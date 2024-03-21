@@ -5,8 +5,8 @@
 #include <ctime>
 #include <cmath>
 
-const int MAP_HEIGHT = 100;
-const int MAP_LENGTH = 200;
+const int MAP_HEIGHT = 200;
+const int MAP_LENGTH = 400;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
 const int MIN_SEALEVEL = MAP_HEIGHT/2;
@@ -69,6 +69,47 @@ int CalculateSurfaceChain(int**& map,int x){
     return WaterCounter;
 }
 
+void TickWater(int **& map){
+    for(int y=0; y !=MAP_HEIGHT-1;y++)
+    {
+        for (int x =1; x!= MAP_LENGTH-1; x++)
+        {
+            if (map[y][x] == 3 && map[y+1][x] == 0)
+            {
+                std::swap(map[y][x], map[y+1][x]);
+            }
+            switch (rand()%4)
+            {
+            case 0:
+                if (map[y][x] == 3 && map[y][x-1] == 0)
+                {
+                    std::swap(map[y][x], map[y][x-1]);
+                }
+                break;
+            case 1:            
+                if (map[y][x] == 3 && map[y][x+1] == 0)
+                {
+                    std::swap(map[y][x], map[y][x+1]);
+                }
+                break;
+            // case :            
+            //     if (map[y][x] == 3 && map[y][x+1] == 0)
+            //     {
+            //         std::swap(map[y][x], map[y][x+1]);
+            //     }
+            //     break;
+            // case 3:            
+            //     if (map[y][x] == 3 && map[y][x+1] == 0)
+            //     {
+            //         std::swap(map[y][x], map[y][x+1]);
+            //     }
+            //     break;
+            default:
+                break;
+            }
+        }
+    }
+}
 // Убирает слишком маленькие зоны наполнения водой.
 void WaterClean(int**& map, int MinWaterChainSize = 10)
 {
@@ -91,6 +132,7 @@ void WaterClean(int**& map, int MinWaterChainSize = 10)
                     {
                         map[y][i] = 0;
                     }
+                    
                 }
 
             }
@@ -218,7 +260,10 @@ int main()
         RandomWalkTopSmoothed(tilemap,SECTIONWIDTH); 
         WaterFill(tilemap);                          
         WaterClean(tilemap,7);
-        applyPerlinNoiseInsideStones(tilemap, MAP_LENGTH, MAP_HEIGHT);
+        applyPerlinNoiseInsideStones(tilemap, MAP_LENGTH, MAP_HEIGHT, SEALEVEL);
+        // for (int i =0;i!=MAP_HEIGHT;i++){
+        //     TickWater(tilemap);
+        // }
     }
     catch(std::runtime_error err){
         std::cout << "\n" << err.what() << "\n";
@@ -278,10 +323,14 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
-            if (event.key.scancode == sf::Keyboard::Scan::Escape){
-                window.clear();
-                DebugNumMode = 1;
+            if (event.type == event.KeyPressed)
+            {
+                if (event.key.scancode == sf::Keyboard::Scan::Escape){
+                    window.clear();
+                    DebugNumMode = 1;
+                }
             }
+
         }
 
         // Нажатия клавиш
@@ -316,6 +365,7 @@ int main()
             NewZoom.move(0, -movement);
             window.setView(NewZoom);
         }
+        TickWater(tilemap);
         
 
 
@@ -337,7 +387,7 @@ int main()
                     {
                     sf::Text DebugNum;
                     DebugNum.setFont(font);
-                    DebugNum.setCharacterSize(16);
+                    DebugNum.setCharacterSize(10);
                     DebugNum.setPosition(x * tileSize, y * tileSize);
                     DebugNum.setString(std::to_string(tileIndex));
                     DebugNum.setFillColor(sf::Color::White);
@@ -349,6 +399,7 @@ int main()
                 // Отрисовка тайлов
 
                 tiles[tileIndex].setPosition(x * tileSize, y * tileSize);
+                
                 window.draw(tiles[tileIndex]);
             }
         }
