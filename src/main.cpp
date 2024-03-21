@@ -209,6 +209,7 @@ int main()
         RandomWalkTopSmoothed(tilemap,SECTIONWIDTH); 
         WaterFill(tilemap);                          
         WaterClean(tilemap,7);
+        applyPerlinNoiseInsideStones(tilemap, MAP_LENGTH, MAP_HEIGHT);
     }
     catch(std::runtime_error err){
         std::cout << "\n" << err.what() << "\n";
