@@ -4,8 +4,8 @@
 #include <ctime>
 #include <cmath>
 
-const int MAP_HEIGHT = 200;
-const int MAP_LENGTH = 600;
+const int MAP_HEIGHT = 100;
+const int MAP_LENGTH = 200;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
 const int MIN_SEALEVEL = MAP_HEIGHT/2;
@@ -207,7 +207,7 @@ int main()
     {
         RandomWalkTopSmoothed(tilemap,SECTIONWIDTH); 
         WaterFill(tilemap);                          
-        WaterClean(tilemap,7);
+        WaterClean(tilemap,8);
     }
     catch(std::runtime_error err){
         std::cout << "\n" << err.what() << "\n";
@@ -324,7 +324,7 @@ int main()
     text.setCharacterSize(24); // Устанавливаем размер шрифта
     text.setPosition(MAP_LENGTH/2,0); // Устанавливаем положение
     text.setFillColor(sf::Color::Black); // Устанавливаем цвет текста
-    
+
     window.draw(WaterLine);
     window.draw(text);
     window.display();
