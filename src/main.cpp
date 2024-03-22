@@ -3,8 +3,8 @@
 #include "textures.h"
 
 
-const int MAP_HEIGHT = 100;
-const int MAP_LENGTH = 300;
+const int MAP_HEIGHT = 2000/16;
+const int MAP_LENGTH = 4000/16;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
 const int MIN_SEALEVEL = MAP_HEIGHT/2;
@@ -200,14 +200,15 @@ int**& RandomWalkTopSmoothed(int**& map, int minSectionWidth)
 int main()
 {
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
-    int GLOBAL_SEED = time(0);
+    // int GLOBAL_SEED = time(0);
+    int GLOBAL_SEED = 1710959590;
     srand(GLOBAL_SEED);
 
-    // GLOBAL_SEED = 1710959590;
+    
     std::cout << GLOBAL_SEED << "\n";
 
     // Создание окна
-    sf::RenderWindow window(sf::VideoMode(600, 600), "Tilemap");
+    sf::RenderWindow window(sf::VideoMode(900, 900), "Tilemap");
 
     // Загрузка тайлсета
     sf::Texture tileset;
@@ -231,7 +232,7 @@ int main()
         return -1;
     }
 
-    // Отрисовка цифр вместо тайлов. (Внимание! разбивает на группы 2 на 2 блока, и рисует цифру верхнего левого из них. Не точно!)
+
     int DebugNumMode = 0;
 
 
@@ -264,6 +265,7 @@ int main()
         WaterFill(tilemap);                          
         WaterClean(tilemap,7);
         applyPerlinNoiseInsideStones(tilemap, MAP_LENGTH, MAP_HEIGHT, SEALEVEL);
+        PerlinOre(tilemap, MAP_LENGTH, MAP_HEIGHT, SEALEVEL);
         // for (int i =0;i!=MAP_HEIGHT;i++){
         //     TickWater(tilemap);
         // }
@@ -327,7 +329,7 @@ int main()
             {
                 if (event.key.scancode == sf::Keyboard::Scan::Escape){
                     window.clear();
-                    DebugNumMode = 1;
+                    DebugNumMode =(DebugNumMode+1)%2;
                 }
             }
 
@@ -382,17 +384,18 @@ int main()
                 int tileIndex = tilemap[y][x];
 
                 // Для режима с числами вместо тайлов
-                if (DebugNumMode)
-                {   if (x%4 ==0 && y%4 ==0)
-                    {
+                if (DebugNumMode){
+                // {   if (x%16 ==0 && y%16 ==0)
+                //     {
                     sf::Text DebugNum;
                     DebugNum.setFont(font);
-                    DebugNum.setCharacterSize(10);
-                    DebugNum.setPosition(x * tileSize, y * tileSize);
+                    DebugNum.setCharacterSize(16);
+                    DebugNum.setPosition(x * tileSize+2, y * tileSize);
                     DebugNum.setString(std::to_string(tileIndex));
                     DebugNum.setFillColor(sf::Color::White);
+
                     window.draw(DebugNum);
-                    }
+                    // 
                     continue;
                 }       
 

@@ -10,7 +10,7 @@ double perlin(int x, int y)
 // битовая переменная нужна для прихода к положительному значения, а double для прихода к значению от -1 до 1, хз зачем, так в алгоритмах пишут, что это стандарт. остальные числа для хаотичности
 void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT, int SEALEVEL) 
 {
-    double porog = 0.1; // пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
+    double porog = 0.08; // пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
     std::cout.precision(2);
     int PERLINKEY_X = rand()%100000;
     int PERLINKEY_Y = rand()%100000;
@@ -19,7 +19,7 @@ void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT, in
         for (int x = 0; x < MAP_LENGTH; ++x) 
         {
             // std::cout << perlinNoise(x, y) << " ";
-            float diff = pow((static_cast<float>(y)/static_cast<float>(SEALEVEL))- 1 ,4);
+            float diff = pow((static_cast<float>(y)/static_cast<float>(SEALEVEL))- 1 ,9);
             float noise = interpolatedNoise((x)/5.f+ PERLINKEY_X,y/5.f+PERLINKEY_Y);
             
 
@@ -40,6 +40,28 @@ void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT, in
                 }
 
 
+            }
+        }
+    }
+}
+
+void PerlinOre(int**& map, int MAP_LENGTH, int MAP_HEIGHT, int SEALEVEL) 
+{
+    double porog = 0.4; // пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
+    std::cout.precision(2);
+    int PERLINKEY_X = rand()%100000;
+    int PERLINKEY_Y = rand()%100000;
+    for (int y = SEALEVEL*1.7; y < MAP_HEIGHT; ++y) 
+    {
+        for (int x = 0; x < MAP_LENGTH; ++x) 
+        {
+            // std::cout << perlinNoise(x, y) << " ";
+            float diff = (static_cast<float>(y)/static_cast<float>(SEALEVEL) -1);
+            float noise = interpolatedNoise((x)/2.f+ PERLINKEY_X,y/2.f+PERLINKEY_Y);
+
+            if ((noise*diff>= porog) && (map[y][x] == 6) && (y > SEALEVEL))
+            {
+                map[y][x] = 7;
             }
         }
     }
