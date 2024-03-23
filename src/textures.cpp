@@ -1,47 +1,48 @@
 #include "textures.h"
 
 
-double perlin(int x, int y) 
+double perlin(int x, int Y) 
 {
-    int n = x + y * 57;
+    int n = x + Y * 2999;
     n = (n << 13) ^ n;
-    return (1.0 - ((n * (n * n * 15731 + 789221 ) + 1376312589) & 0x7fffffff) / 1073741824.0);
+    return (1.0 - ((n * (n * n * 15731 + 789221 + 3001) + 1376312589) & 0x7fffffff) / 1073741824.0);
 }
 // битовая переменная нужна для прихода к положительному значения, а double для прихода к значению от -1 до 1, хз зачем, так в алгоритмах пишут, что это стандарт. остальные числа для хаотичности
 void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT, int SEALEVEL) 
 {
     double porog = 0.08; // пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
     std::cout.precision(2);
-    int PERLINKEY_X = rand()%100000;
-    int PERLINKEY_Y = rand()%100000;
-    for (int y = 0; y < MAP_HEIGHT; ++y) 
+    int PERLINKEY_X = rand()%100;
+    int PERLINKEY_Y = rand()%100;
+    for (int Y = 0; Y < MAP_HEIGHT; ++Y) 
     {
         for (int x = 0; x < MAP_LENGTH; ++x) 
         {
-            // std::cout << perlinNoise(x, y) << " ";
-            float diff = pow((static_cast<float>(y)/static_cast<float>(SEALEVEL))- 1 ,9);
-            float noise = interpolatedNoise((x)/5.f+ PERLINKEY_X,y/5.f+PERLINKEY_Y);
+            // std::cout << perlinNoise(x, Y) << " ";
+            float diff = pow((static_cast<float>(Y)/static_cast<float>(SEALEVEL))- 1 ,9);
+            float noise = interpolatedNoise((x)/5.f+ PERLINKEY_X,Y/5.f+PERLINKEY_Y);
             
 
 
-            if ((noise+diff>= porog) && (map[y][x] == 6) && (y > SEALEVEL))
+            if ((noise+diff>= porog) && (map[Y][x] == 6) && (Y > SEALEVEL))
             {
-                // double noiseValue = perlin(x, y); // для шума Перлина
+                // double noiseValue = perlin(x, Y); // для шума Перлина
                 // std::cout << noiseValue << " ";
 
                 int WaterRand = rand() % 2; // тут я выебываюсь просто
                 if (WaterRand)
                 {
-                    map[y][x] = 4;
+                    map[Y][x] = 4;
                 }
                 else
                 {
-                    map[y][x] = 0;
+                    map[Y][x] = 0;
                 }
 
 
             }
         }
+
     }
 }
 
@@ -49,55 +50,103 @@ int Map::PerlinCaves(Ore OreType)
 {
     float porog; // - пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
     float Interpolation;
-    float HightDiff;
+    float HightDiff = 1.f;
     switch (OreType)
     {
     case Diamond:
-        porog = 0.3;
+        porog = 0.9;
         Interpolation = 2.f;
+        HightDiff = 1.5f;
         break;
     case Redstone:
         porog = 0.4;
         Interpolation = 4.f;
         break;
     case Air:
-        porog = 0.02;
-        Interpolation = 2.f;
-        HightDiff = 0.2f;
+        porog = 0.0f;
+        Interpolation = 2.5f;
+        HightDiff = 2;
+        break;
+    case Stone:
+        porog = 0.0f;
+        Interpolation = 2.5f;
     default:
-        porog = 0.02;
-        Interpolation = 2.f;
+        porog = 0.f;
+        Interpolation = 2.5f;
         break;
     }
 
 
     int PERLINKEY_X = rand()%100000;
     int PERLINKEY_Y = rand()%100000;
-    for (int y = 1; y < MAP_HEIGHT; ++y) 
+    for (int Y =0; Y < MAP_HEIGHT; ++Y) 
     {
         for (int x = 0; x < MAP_LENGTH; ++x) 
         {
-            // std::cout << perlinNoise(x, y) << " ";
-            float diff = (static_cast<float>(y)/static_cast<float>(SEA_LEVEL)/4);
-            if (y<SEA_LEVEL){
-                diff *=0.2;
-            }
-            float noise = interpolatedNoise((x)/Interpolation+ PERLINKEY_X,y/Interpolation+PERLINKEY_Y);
+            // std::cout << perlinNoise(x, Y) << " ";
+            float diff = (static_cast<float>(Y)/static_cast<float>(SEA_LEVEL))*HightDiff;
 
-            if ((noise*diff> porog) && (Tiles[y][x] == 6))
+            float noise = interpolatedNoise((x)/Interpolation+ PERLINKEY_X,Y/Interpolation+PERLINKEY_Y);
+
+            if ((noise*diff> porog) && (Tiles[Y][x] == 6))
             {
-                Tiles[y][x] = static_cast<int>(OreType);
+                Tiles[Y][x] = static_cast<int>(OreType);
+ 
+            }
+        }
+        
+    }
+    return 1;
+}
+
+int Map::PerlinHights(Ore OreType)
+{
+    float porog; // - пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
+    float Interpolation;
+    float HightDiff;
+    porog = -0.18f;
+    Interpolation = 4.f;
+    srand(GLOBAL_SEED);
+    double PERLINKEY_X = rand()%100;
+    double PERLINKEY_Y = rand()%100;
+
+    for (int x = 0; x < MAP_LENGTH; ++x) 
+    {
+        for (int Y = GetGeneratedHeight(x); Y < MAP_HEIGHT; ++Y) 
+        {
+            // std::cout << perlinNoise(x, Y) << " ";
+            float noise = interpolatedNoise((x+PERLINKEY_X)/Interpolation,(Y+PERLINKEY_Y)/Interpolation);
+            if ((noise> porog) && (Tiles[Y][x] == 0))
+            {
+                Tiles[Y][x] = static_cast<int>(OreType);
             }
         }
     }
     return 1;
 }
 
-float smoothNoise(float x, float y) {
-    float corners = (perlin(x - 1, y - 1) + perlin(x + 1, y - 1) + perlin(x - 1, y + 1) + perlin(x + 1, y + 1)) / 16;
-    float sides = (perlin(x - 1, y) + perlin(x + 1, y) + perlin(x, y - 1) + perlin(x, y + 1)) / 8;
-    float center = perlin(x, y) / 4;
+float smoothNoise(float x, float Y) {
+    float corners = (perlin(x - 1, Y - 1) + perlin(x + 1, Y - 1) + perlin(x - 1, Y + 1) + perlin(x + 1, Y + 1)) / 16;
+    float sides = (perlin(x - 1, Y) + perlin(x + 1, Y) + perlin(x, Y - 1) + perlin(x, Y + 1)) / 8;
+    float center = perlin(x, Y) / 4;
     return corners + sides + center;
+}
+
+int Map::LiquidStripe(Liquid LiquidType,float UpperBoundary, float DownBoundary, float percentage)
+{
+    for (int Y = MAP_HEIGHT/UpperBoundary;Y!=MAP_HEIGHT/DownBoundary && Y<MAP_HEIGHT;++Y)
+    {
+        for (int X = 0; X != MAP_LENGTH; ++X)
+        {
+        
+            if ((Tiles[Y][X] == 0) && (static_cast<float>(rand()%101)/100 <= percentage))
+            {
+                Tiles[Y][X].SetID(static_cast<int>(LiquidType));
+                Tiles[Y][X].SetType(1);
+            }
+        }
+    }
+    return 1;
 }
 
 // Функция для интерполяции шума... интерполяция - вычисление среднего значения. Т.е. выравнивание
@@ -108,11 +157,11 @@ float interpolate(float a, float b, float x) {
 }
 
 // Функция для генерации окончательного шума Перлина
-float interpolatedNoise(float x, float y) {
+float interpolatedNoise(float x, float Y) {
     int integer_X = int(x);
     float fractional_X = x - integer_X;
-    int integer_Y = int(y);
-    float fractional_Y = y - integer_Y;
+    int integer_Y = int(Y);
+    float fractional_Y = Y - integer_Y;
     float v1 = smoothNoise(integer_X, integer_Y);
     float v2 = smoothNoise(integer_X + 1, integer_Y);
     float v3 = smoothNoise(integer_X, integer_Y + 1);
@@ -126,13 +175,13 @@ int Map::RandomWalkSurface()
 {
 
     // std::cout << seed;
-    int minSectionWidth = 2;
+    int minSectionWidth = 5;
     
     int randint = rand();
 
     //Определили начальную высоту
     SEA_LEVEL = MAP_HEIGHT/2;
-    int lastHeight = SEA_LEVEL-SEA_LEVEL*0.03;
+    int lastHeight = MAP_HEIGHT/3;
 
     //Это для направления движения
     int nextMove = 0;
@@ -152,7 +201,7 @@ int Map::RandomWalkSurface()
             lastHeight--;
             sectionWidth = 0;
         }
-        else if ((nextMove == 1) && (lastHeight < MAP_HEIGHT) && (sectionWidth > minSectionWidth) )
+        else if ((nextMove == 1) && (lastHeight < MAP_HEIGHT) && (sectionWidth > minSectionWidth))
         {
             lastHeight++;
             sectionWidth = 0;
@@ -161,9 +210,10 @@ int Map::RandomWalkSurface()
         sectionWidth++;
 
         //Заполняем все под нашей высотой камнем
-        for (int y = lastHeight; y < MAP_HEIGHT; y++)
+        int RandWidth = rand()%2;
+        for (int Y = lastHeight; Y < lastHeight+5+RandWidth; Y++)
         {
-            Tiles[y][x] = 6;
+            Tiles[Y][x] = 6;
 
         }
 
@@ -171,8 +221,81 @@ int Map::RandomWalkSurface()
 
     // for (int Y=0;Y!=MAP_HEIGHT;Y++){
     //     for (int X=0;X!=MAP_LENGTH;X++){
-    //         std::cout << Tiles[y][x];
+    //         std::cout << Tiles[Y][x];
     //     }
     // }
     return 1;
+}
+
+void Update::UpdateLiquids(){
+    int MapHeight = tilemap.GetMapHeight();
+    int MapLength = tilemap.GetMapLength();
+    for (int Y=0; Y!=MapHeight;Y++)
+    {
+        for (int X=0;X!=MapLength;X++)
+        {
+            if (tilemap.Tiles[Y][X].GetType() == 1)
+            {
+                if (Y < MapHeight-1 && tilemap[Y+1][X] == 0)
+                {
+                    std::swap(tilemap[Y][X], tilemap[Y+1][X]);
+                }
+                switch (rand()%2) 
+                {
+                case 0:
+                    if (X > 0 && tilemap[Y][X-1] == 0)
+                    {
+                        std::swap(tilemap[Y][X], tilemap[Y][X-1]);
+                    }
+                    break;
+                case 1:            
+                    if (X < MapLength && tilemap[Y][X+1] == 0)
+                    {
+                        std::swap(tilemap[Y][X], tilemap[Y][X+1]);
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void Update::UpdateFallingTile()
+{
+    int MapHeight = tilemap.GetMapHeight();
+    int MapLength = tilemap.GetMapLength();
+
+    for (int Y=0; Y!=MapHeight;Y++)
+    {
+        for (int X=0;X!=MapLength;X++)
+        {
+            if (tilemap.Tiles[Y][X].GetType() == 1)
+            {
+                if (Y < MapHeight-1 && tilemap[Y+1][X] == 0)
+                {
+                    std::swap(tilemap[Y][X], tilemap[Y+1][X]);
+                }
+                switch (rand()%2) 
+                {
+                case 0:
+                    if (X > 0 && tilemap[Y+1][X-1] == 0)
+                    {
+                        std::swap(tilemap[Y][X], tilemap[Y+1][X-1]);
+                    }
+                    break;
+                case 1:            
+                    if (X < MapLength && tilemap[Y+1][X+1] == 0)
+                    {
+                        std::swap(tilemap[Y][X], tilemap[Y+1][X+1]);
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+            }
+        }
+    }
 }

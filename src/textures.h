@@ -13,12 +13,22 @@ float smoothNoise(float x, float y);
 float interpolate(float a, float b, float x);
 float interpolatedNoise(float x, float y);
 
-enum Ore{
+enum Ore
+{
     Air = 0,
-    Copper = 1,
-    Lead = 2,
-    Diamond = 3,
-    Redstone = 4
+    // Copper = 1,
+    // Lead = 2,
+    Diamond = 7,
+    Redstone = 8,
+    Stone = 6
+};
+
+enum Liquid
+{
+    WaterUnder = 5,
+    WaterOver = 4,
+    Lava = 9
+
 };
 
 class Tile{
@@ -38,6 +48,11 @@ public:
     {
         TextureID = n;
     }
+    void SetID(int n)
+    {
+        TextureID=n;
+    }
+
     void SetType(int n)
     {
         Type = n;
@@ -45,6 +60,11 @@ public:
     int GetTile(){
         return TextureID;
     }
+    int GetType()
+    {
+        return Type;
+    }
+
     bool operator==(int N)
     {
         return TextureID==N;
@@ -53,8 +73,15 @@ public:
     ~Tile(){}
 };
 
+class Update;
 
-
+class Entity
+{
+ private:
+    int EntityID;
+    int Health;
+    sf::Time OutOfView;
+};
 
 class Map{
 
@@ -74,11 +101,42 @@ public:
                 Tiles[i] = new Tile [MAP_LENGTH];
             }
         }
+        int GetGeneratedHeight(int X)
+        {
+            int EncounteredSurface = 0;
+            for(int Y=0;Y != MAP_HEIGHT;Y++)
+            {
+                
+                if (Tiles[Y][X]==6)
+                {
+                    EncounteredSurface = 1;
+                }
+                if (EncounteredSurface && Tiles[Y][X] == 0)
+                {
+                    return Y;
+                }
+            }
+            return MAP_HEIGHT-1;
+        }
+
         int RandomWalkSurface();
-        
+        int GetMapHeight()
+        {
+            return MAP_HEIGHT;
+        }
+        int GetMapLength()
+        {
+            return MAP_LENGTH;
+        }
+        Tile**& ReturnTiles(){
+            return Tiles;
+        }
+        int LiquidStripe(Liquid LiquidType,float UpperBoundary, float DownBoundary,float percentage);
         // int OceanGen();
         // int LakesGen();
         int PerlinCaves(Ore OreType);
+        int PerlinHights(Ore OreType);
+        // int 
         // int PerlinOres();
         // int GrassTiles();
 
@@ -98,13 +156,20 @@ public:
             }
             delete Tiles;
         }
+        friend Update;
 };
 
-
-// class Update{
-//     private:
-//         Map tilemap;
-//         void UpdateWater();
-//         void UpdateFallingTile();
-//         // void 
-// };
+class Update{
+    private:
+        Map tilemap;
+        void UpdateLiquids();
+        void UpdateFallingTile();
+        // void UpdateEntities();
+    public:
+        Update(Map& tiles) : tilemap(tiles){}
+        void tick()
+        {
+            UpdateLiquids();
+        }
+        
+};
