@@ -45,26 +45,52 @@ void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT, in
     }
 }
 
-void PerlinOre(int**& map, int MAP_LENGTH, int MAP_HEIGHT, int SEALEVEL) 
+int Map::PerlinCaves(Ore OreType)
 {
-    double porog = 0.4; // пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
-    std::cout.precision(2);
+    float porog; // - пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
+    float Interpolation;
+    float HightDiff;
+    switch (OreType)
+    {
+    case Diamond:
+        porog = 0.3;
+        Interpolation = 2.f;
+        break;
+    case Redstone:
+        porog = 0.4;
+        Interpolation = 4.f;
+        break;
+    case Air:
+        porog = 0.02;
+        Interpolation = 2.f;
+        HightDiff = 0.2f;
+    default:
+        porog = 0.02;
+        Interpolation = 2.f;
+        break;
+    }
+
+
     int PERLINKEY_X = rand()%100000;
     int PERLINKEY_Y = rand()%100000;
-    for (int y = SEALEVEL*1.7; y < MAP_HEIGHT; ++y) 
+    for (int y = 1; y < MAP_HEIGHT; ++y) 
     {
         for (int x = 0; x < MAP_LENGTH; ++x) 
         {
             // std::cout << perlinNoise(x, y) << " ";
-            float diff = (static_cast<float>(y)/static_cast<float>(SEALEVEL) -1);
-            float noise = interpolatedNoise((x)/2.f+ PERLINKEY_X,y/2.f+PERLINKEY_Y);
+            float diff = (static_cast<float>(y)/static_cast<float>(SEA_LEVEL)/4);
+            if (y<SEA_LEVEL){
+                diff *=0.2;
+            }
+            float noise = interpolatedNoise((x)/Interpolation+ PERLINKEY_X,y/Interpolation+PERLINKEY_Y);
 
-            if ((noise*diff>= porog) && (map[y][x] == 6) && (y > SEALEVEL))
+            if ((noise*diff> porog) && (Tiles[y][x] == 6))
             {
-                map[y][x] = 7;
+                Tiles[y][x] = static_cast<int>(OreType);
             }
         }
     }
+    return 1;
 }
 
 float smoothNoise(float x, float y) {
@@ -94,4 +120,59 @@ float interpolatedNoise(float x, float y) {
     float i1 = interpolate(v1, v2, fractional_X);
     float i2 = interpolate(v3, v4, fractional_X);
     return interpolate(i1, i2, fractional_Y);
+}
+
+int Map::RandomWalkSurface()
+{
+
+    // std::cout << seed;
+    int minSectionWidth = 2;
+    
+    int randint = rand();
+
+    //Определили начальную высоту
+    SEA_LEVEL = MAP_HEIGHT/2;
+    int lastHeight = SEA_LEVEL-SEA_LEVEL*0.03;
+
+    //Это для направления движения
+    int nextMove = 0;
+    //Длина текущего шага
+    int sectionWidth = 0;
+
+    //проходим по всем X
+    for (int x = 0; x < MAP_LENGTH; x++)
+    {
+        //Рандомно определяем куда идти
+        nextMove = randint%2;
+        randint = rand();
+
+        //Если длина секции > макс длины секции -> меняем высоту.
+        if ((nextMove == 0) && (lastHeight > 0) && (sectionWidth > minSectionWidth))
+        {
+            lastHeight--;
+            sectionWidth = 0;
+        }
+        else if ((nextMove == 1) && (lastHeight < MAP_HEIGHT) && (sectionWidth > minSectionWidth) )
+        {
+            lastHeight++;
+            sectionWidth = 0;
+        }
+        //Увеличиваем длину секции
+        sectionWidth++;
+
+        //Заполняем все под нашей высотой камнем
+        for (int y = lastHeight; y < MAP_HEIGHT; y++)
+        {
+            Tiles[y][x] = 6;
+
+        }
+
+    }
+
+    // for (int Y=0;Y!=MAP_HEIGHT;Y++){
+    //     for (int X=0;X!=MAP_LENGTH;X++){
+    //         std::cout << Tiles[y][x];
+    //     }
+    // }
+    return 1;
 }

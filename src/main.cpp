@@ -3,8 +3,8 @@
 #include "textures.h"
 
 
-const int MAP_HEIGHT = 2000/16;
-const int MAP_LENGTH = 4000/16;
+const int MAP_HEIGHT = 100;
+const int MAP_LENGTH = 200;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
 const int MIN_SEALEVEL = MAP_HEIGHT/2;
@@ -143,59 +143,7 @@ void WaterClean(int**& map, int MinWaterChainSize = 10)
 }
 
 // RandomWalk для первичной генерации линии поверхности
-int**& RandomWalkTopSmoothed(int**& map, int minSectionWidth)
-{
 
-    // std::cout << seed;
-    
-    int randint = rand();
-
-    //Определили начальную высоту
-    int lastHeight = SEALEVEL-SEALEVEL*0.03;
-
-    //Это для направления движения
-    int nextMove = 0;
-    //Длина текущего шага
-    int sectionWidth = 0;
-
-    //проходим по всем X
-    for (int x = 0; x < MAP_LENGTH; x++)
-    {
-        //Рандомно определяем куда идти
-        nextMove = randint%2;
-        randint = rand();
-
-        //Если длина секции > макс длины секции -> меняем высоту.
-        if ((nextMove == 0) && (lastHeight > 0) && (sectionWidth > minSectionWidth))
-        {
-            lastHeight--;
-            sectionWidth = 0;
-        }
-        else if ((nextMove == 1) && (lastHeight < MAP_HEIGHT) && (sectionWidth > minSectionWidth) )
-        {
-            lastHeight++;
-            sectionWidth = 0;
-        }
-        //Увеличиваем длину секции
-        sectionWidth++;
-
-        //Заполняем все под нашей высотой землей в два слоя и камнем ниже.
-    
-        map[lastHeight][x] = 1;
-        if (lastHeight + 1 < MAP_HEIGHT){
-            map[lastHeight+1][x] = 2;
-        }
-        if (lastHeight + 2 < MAP_HEIGHT){
-            map[lastHeight+1][x] = 3;
-        }
-        for (int y = lastHeight+2; y < MAP_HEIGHT; y++)
-        {
-            map[y][x] = 6;
-        }
-    }
-
-    return map;
-}
 
 int main()
 {
@@ -247,25 +195,26 @@ int main()
 
     // Создание тайлмапа, заполнение пустотой
 
-    int** tilemap = new int*[MAP_HEIGHT];
-    for (int i=0;i!=MAP_HEIGHT;i++){
-        tilemap[i] = new int[MAP_LENGTH];
-    }
+    // int** tilemap = new int*[MAP_HEIGHT];
+    // for (int i=0;i!=MAP_HEIGHT;i++){
+    //     tilemap[i] = new int[MAP_LENGTH];
+    // }
 
-    for (int i= 0;i!=MAP_HEIGHT;i++){
-        for (int j=0;j!=MAP_LENGTH;j++){
-            tilemap[i][j] = 0;
-        }
-    }
-    
+    // for (int i= 0;i!=MAP_HEIGHT;i++){
+    //     for (int j=0;j!=MAP_LENGTH;j++){
+    //         tilemap[i][j] = 0;
+    //     }
+    // }
+    Map tilemap(MAP_HEIGHT, MAP_LENGTH, 0);
 
     try
     {
-        RandomWalkTopSmoothed(tilemap,SECTIONWIDTH); 
-        WaterFill(tilemap);                          
-        WaterClean(tilemap,7);
-        applyPerlinNoiseInsideStones(tilemap, MAP_LENGTH, MAP_HEIGHT, SEALEVEL);
-        PerlinOre(tilemap, MAP_LENGTH, MAP_HEIGHT, SEALEVEL);
+        tilemap.RandomWalkSurface();
+        // RandomWalkTopSmoothed(tilemap,SECTIONWIDTH); 
+        // WaterFill(tilemap);                          
+        // WaterClean(tilemap,7);
+        tilemap.PerlinCaves(Air);
+        // PerlinOre(tilemap, MAP_LENGTH, MAP_HEIGHT, SEALEVEL);
         // for (int i =0;i!=MAP_HEIGHT;i++){
         //     TickWater(tilemap);
         // }
@@ -337,67 +286,85 @@ int main()
 
         // Нажатия клавиш
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && NewZoom.getSize().x < MAP_LENGTH*tileSize*2)
         {
-            NewZoom.zoom(1.08);
+            NewZoom.zoom(1.02);
             window.setView(NewZoom);
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && NewZoom.getSize().x > MAP_LENGTH*tileSize/10)
         {
-            NewZoom.zoom(0.92);
+            NewZoom.zoom(0.98);
             window.setView(NewZoom);
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && NewZoom.getCenter().x > 0)
         {
             NewZoom.move(-movement, 0);
             window.setView(NewZoom);
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)&& NewZoom.getCenter().y <MAP_HEIGHT*tileSize)
         {
             NewZoom.move(0, movement);
             window.setView(NewZoom);
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)&& NewZoom.getCenter().x < MAP_LENGTH*tileSize)
         {
             NewZoom.move(movement, 0);
             window.setView(NewZoom);
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)&& NewZoom.getCenter().y > 0)
         {
             NewZoom.move(0, -movement);
             window.setView(NewZoom);
         }
-        TickWater(tilemap);
+        // TickWater(tilemap);
         
 
 
 
         // Отрисовка тайлмапа
         window.clear();
+        sf::Vector2f ViewSize = NewZoom.getSize();
+        sf::Vector2f ViewCenter = NewZoom.getCenter();
 
-        for (int y = 0; y < MAP_HEIGHT; ++y)
+        float LoadedXL = (ViewCenter.x - ViewSize.x/2)/tileSize;
+        LoadedXL < 0 ? LoadedXL = 0 : LoadedXL=LoadedXL;
+
+        float LoadedXR = (ViewCenter.x + ViewSize.x/2)/tileSize;
+        LoadedXR > MAP_LENGTH ? LoadedXR = MAP_LENGTH-1 :  LoadedXR=LoadedXR;
+
+        float LoadedYU = (ViewCenter.y - ViewSize.y/2)/tileSize;
+        LoadedYU < 0 ? LoadedYU = 0 : LoadedYU=LoadedYU;
+
+        float LoadedYD = (ViewCenter.y + ViewSize.y/2)/tileSize;
+        LoadedYD > MAP_HEIGHT ? LoadedYD = MAP_HEIGHT-1 :  LoadedYD=LoadedYD;
+
+        std::cout << "LOADING TILES FROM X = " << LoadedXL << " TO X = " << LoadedXR << "\n";
+        std::cout << "LOADING TILES FROM Y = " << LoadedYU << " TO Y = " << LoadedYD << "\n";
+    
+
+        for (int y = LoadedYU; y < LoadedYD; ++y)
         {  
-            for (int x = 0; x < MAP_LENGTH; ++x)
+            for (int x = LoadedXL; x < LoadedXR; ++x)
             {
 
                 // Получаем число внутри элемента тайлмапа, обозначающее номер нужной текстурки
-                int tileIndex = tilemap[y][x];
+                int tileIndex = tilemap[y][x].GetTile();
 
                 // Для режима с числами вместо тайлов
-                if (DebugNumMode){
+                // if (DebugNumMode){
                 // {   if (x%16 ==0 && y%16 ==0)
                 //     {
-                    sf::Text DebugNum;
-                    DebugNum.setFont(font);
-                    DebugNum.setCharacterSize(16);
-                    DebugNum.setPosition(x * tileSize+2, y * tileSize);
-                    DebugNum.setString(std::to_string(tileIndex));
-                    DebugNum.setFillColor(sf::Color::White);
+                //     sf::Text DebugNum;
+                //     DebugNum.setFont(font);
+                //     DebugNum.setCharacterSize(16);
+                //     DebugNum.setPosition(x * tileSize+2, y * tileSize);
+                //     DebugNum.setString(std::to_string(tileIndex));
+                //     DebugNum.setFillColor(sf::Color::White);
 
-                    window.draw(DebugNum);
-                    // 
-                    continue;
-                }       
+                //     window.draw(DebugNum);
+                //     // 
+                //     continue;
+                // }       
 
                 // Отрисовка тайлов
 
@@ -418,7 +385,5 @@ int main()
     window.draw(SeedText);
     window.display();
     }
-
-    delete tilemap;
     return 0;
 }
