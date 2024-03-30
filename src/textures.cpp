@@ -1,6 +1,5 @@
 #include "textures.h"
 
-
 double perlin(int x, int Y) 
 {
     int n = x + Y * 2999;
@@ -261,6 +260,14 @@ void Update::UpdateLiquids(){
         }
     }
 }
+
+// void Update::UpdateEntities(){
+//     for (int i = 0; i!=EntitiesMAX;i++)
+//     {
+//         Entities[i].GetSprite(
+//     }
+// }
+
 
 void Update::UpdateFallingTile()
 {

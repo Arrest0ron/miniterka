@@ -1,6 +1,7 @@
 #pragma once
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
+#include <memory>
 #include <iostream>
 #include <cmath>
 #include <ctime>
@@ -12,6 +13,10 @@ double perlin(int x, int y);
 float smoothNoise(float x, float y);
 float interpolate(float a, float b, float x);
 float interpolatedNoise(float x, float y);
+
+
+class Update;
+class Entity;
 
 enum Ore
 {
@@ -69,19 +74,23 @@ public:
     {
         return TextureID==N;
     }
+        bool operator!=(int N)
+    {
+        return TextureID!=N;
+    }
 
     ~Tile(){}
 };
 
 class Update;
 
-class Entity
-{
- private:
-    int EntityID;
-    int Health;
-    sf::Time OutOfView;
-};
+// class Entity
+// {
+//  private:
+//     int EntityID;
+//     int Health;
+//     sf::Time OutOfView;
+// };
 
 class Map{
 
@@ -128,6 +137,7 @@ public:
         {
             return MAP_LENGTH;
         }
+        int GetSurfaceHeight(int X);
         Tile**& ReturnTiles(){
             return Tiles;
         }
@@ -162,14 +172,70 @@ public:
 class Update{
     private:
         Map tilemap;
+        std::unique_ptr<Entity[]> Entities;
+        int EntitiesMAX;
         void UpdateLiquids();
         void UpdateFallingTile();
-        // void UpdateEntities();
+        void UpdateEntities();
     public:
-        Update(Map& tiles) : tilemap(tiles){}
+        Update(Map& tiles, Entity* EntityList, int entMAX) : tilemap(tiles), Entities(EntityList), EntitiesMAX(entMAX){}
         void tick()
         {
             UpdateLiquids();
+            // UpdateEntities();
         }
+        ~Update(){}
         
+};
+
+class Entity : public sf::Drawable
+{
+public:
+    Entity() : Health(100), ModelLength(16), ModelHeight(16) {}
+    Entity(sf::Texture texture) : m_texture(texture){}
+    ~Entity(){}
+    void setPosition(sf::Vector2f Pos)
+    {
+        m_sprite.setPosition(Pos.x,(Pos.y-1));
+    }
+    void setTexture(sf::Texture texture)
+    {
+        m_texture = texture;
+        m_sprite.setTexture(m_texture);
+        m_sprite.setTextureRect(sf::IntRect(32,0,ModelLength,ModelHeight));
+    }
+    int GetModelLength()
+    {
+        return ModelLength;
+    }
+    int GetModelHeight()
+    {
+        return ModelHeight;
+    }
+
+    sf::Sprite& GetSprite()
+    {
+        return m_sprite;
+    }
+
+    float top = m_sprite.getGlobalBounds().top;
+    float down = top + m_sprite.getGlobalBounds().height;
+    float left = m_sprite.getGlobalBounds().left;
+    float right = left + m_sprite.getGlobalBounds().width;
+private:
+    int Health;
+    int ModelHeight;
+    int ModelLength;
+
+
+
+
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
+    {
+        target.draw(m_sprite, states);
+    }
+
+    sf::Sprite m_sprite;
+    sf::Texture m_texture;
+    friend Update;
 };
