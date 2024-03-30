@@ -3,205 +3,155 @@
 #include "textures.h"
 
 
-const int MAP_HEIGHT = 2000/16;
-const int MAP_LENGTH = 4000/16;
+const int MAP_HEIGHT = 300;
+const int MAP_LENGTH = 260;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
 const int MIN_SEALEVEL = MAP_HEIGHT/2;
 const int MAX_SEALEVEL = MAP_HEIGHT/2+MAP_HEIGHT*0.05;
-const int SEALEVEL = (MIN_SEALEVEL + MAX_SEALEVEL) / 2;
+const int SEALEVEL = MAP_HEIGHT / 2;
 const int SECTIONWIDTH = 6;
 
 const bool PLAYABLE = true;
 
 // Возвращает максимальный y на заданном x, на котором не пусто.
-int GetMaxHight(int**& map,int x) 
-{
-    if (x >= MAP_LENGTH){
+
+int Map::GetSurfaceHeight(int X){
+    if (X >= MAP_LENGTH){
         throw std::runtime_error("X OVERFLOW");
     }
-    if (x < 0){
+    if (X < 0){
         throw std::runtime_error("X UNDER 0");
     }
 
-    for (int y=0;y!=MAP_HEIGHT;y++)
+    for (int Y=0;Y!=MAP_HEIGHT;Y++)
     {
-        if (map[y][x] != 0)
+        if (Tiles[Y][X] != 0)
         {
-            return y;
+            return Y;
         }
     }
-    return MAP_HEIGHT-1;
+    return MAP_HEIGHT-1;   
 }
 
 //Наполняет водой всю пустоту ниже SEALEVEL
-void WaterFill(int**& map)
-{
-    for (int x=0;x!=MAP_LENGTH;x++)
-    {
-        int maxH = GetMaxHight(map,x);
-        if (maxH > SEALEVEL)
-        {
-            for(int y=SEALEVEL;y!=maxH;y++)
-            {
-                map[y][x] = 4;
-            }
-        }
-    }
-}
+// void WaterFill(int**& map)
+// {
+//     for (int x=0;x!=MAP_LENGTH;x++)
+//     {
+//         int maxH = GetMaxHight(map,x);
+//         if (maxH > SEALEVEL)
+//         {
+//             for(int y=SEALEVEL;y!=maxH;y++)
+//             {
+//                 map[y][x] = 4;
+//             }
+//         }
+//     }
+// }
 
 // Считает длину цепочки воды
-int CalculateSurfaceChain(int**& map,int x){
-    int WaterCounter{};
-    for (int i = x;i!=MAP_LENGTH;i++)
-        {
-            if (map[GetMaxHight(map,i)][i] == 3)
-            {
-                WaterCounter ++;
-            } 
+// int CalculateSurfaceChain(int**& map,int x){
+//     int WaterCounter{};
+//     for (int i = x;i!=MAP_LENGTH;i++)
+//         {
+//             if (map[GetMaxHight(map,i)][i] == 3)
+//             {
+//                 WaterCounter ++;
+//             } 
             
-            else{
-                break;
-            }
-        }
-    return WaterCounter;
-}
+//             else{
+//                 break;
+//             }
+//         }
+//     return WaterCounter;
+// }
 
-void TickWater(int **& map){
-    for(int y=0; y !=MAP_HEIGHT;y++)
-    {
-        for (int x =0; x!= MAP_LENGTH; x++)
-        {
-            if (map[y][x] == 4 || map[y][x] == 5)
-            {
-                if (y < SEALEVEL){
-                    map[y][x] = 4;
-                }
-                else
-                {
-                    map[y][x] = 5;
-                }
-
-
+// void Map::TickWater(int **& map){
+//     for(int y=0; y !=MAP_HEIGHT;y++)
+//     {
+//         for (int x =0; x!= MAP_LENGTH; x++)
+//         {
+//             if (map[y][x] == 4 || map[y][x] == 5)
+//             {
+//                 if (y < SEALEVEL){
+//                     map[y][x] = 4;
+//                 }
+//                 else
+//                 {
+//                     map[y][x] = 5;
+//                 }
 
 
-                if (y < MAP_HEIGHT-1 && map[y+1][x] == 0)
-                {
-                    std::swap(map[y][x], map[y+1][x]);
-                }
-                switch (rand()%2)
-                {
-                case 0:
-                    if (x > 0 && map[y][x-1] == 0)
-                    {
-                        std::swap(map[y][x], map[y][x-1]);
-                    }
-                    break;
-                case 1:            
-                    if (x < MAP_LENGTH && map[y][x+1] == 0)
-                    {
-                        std::swap(map[y][x], map[y][x+1]);
-                    }
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-    }
-}
+
+
+//                 if (y < MAP_HEIGHT-1 && map[y+1][x] == 0)
+//                 {
+//                     std::swap(map[y][x], map[y+1][x]);
+//                 }
+//                 switch (rand()%2)
+//                 {
+//                 case 0:
+//                     if (x > 0 && map[y][x-1] == 0)
+//                     {
+//                         std::swap(map[y][x], map[y][x-1]);
+//                     }
+//                     break;
+//                 case 1:            
+//                     if (x < MAP_LENGTH && map[y][x+1] == 0)
+//                     {
+//                         std::swap(map[y][x], map[y][x+1]);
+//                     }
+//                     break;
+//                 default:
+//                     break;
+//                 }
+//             }
+//         }
+//     }
+// }
 // Убирает слишком маленькие зоны наполнения водой.
-void WaterClean(int**& map, int MinWaterChainSize = 10)
-{
-    for (int x=0;x!=MAP_LENGTH;x++)
-    {
+// void WaterClean(int**& map, int MinWaterChainSize = 10)
+// {
+//     for (int x=0;x!=MAP_LENGTH;x++)
+//     {
  
-        int CurrentHight = GetMaxHight(map,x);
-        int CurrentTopTile = map[CurrentHight][x];
+//         int CurrentHight = GetMaxHight(map,x);
+//         int CurrentTopTile = map[CurrentHight][x];
         
-        if (CurrentTopTile !=4){continue;}
-        int WaterChain = CalculateSurfaceChain(map,x);
-        if (WaterChain < MinWaterChainSize)
-        {
+//         if (CurrentTopTile !=4){continue;}
+//         int WaterChain = CalculateSurfaceChain(map,x);
+//         if (WaterChain < MinWaterChainSize)
+//         {
 
-            for (int i =x;i!=x+WaterChain;i++)
-            {
-                for (int y = GetMaxHight(map,i);map[y][i]!=1;y++)
-                {
-                    if (map[y][i] == 3)
-                    {
-                        map[y][i] = 0;
-                    }
+//             for (int i =x;i!=x+WaterChain;i++)
+//             {
+//                 for (int y = GetMaxHight(map,i);map[y][i]!=1;y++)
+//                 {
+//                     if (map[y][i] == 3)
+//                     {
+//                         map[y][i] = 0;
+//                     }
                     
-                }
+//                 }
 
-            }
+//             }
             
-        }
-        x = std::min(x+WaterChain,MAP_LENGTH-1);
-    }
-}
+//         }
+//         x = std::min(x+WaterChain,MAP_LENGTH-1);
+//     }
+// }
 
 // RandomWalk для первичной генерации линии поверхности
-int**& RandomWalkTopSmoothed(int**& map, int minSectionWidth)
-{
-
-    // std::cout << seed;
-    
-    int randint = rand();
-
-    //Определили начальную высоту
-    int lastHeight = SEALEVEL-SEALEVEL*0.03;
-
-    //Это для направления движения
-    int nextMove = 0;
-    //Длина текущего шага
-    int sectionWidth = 0;
-
-    //проходим по всем X
-    for (int x = 0; x < MAP_LENGTH; x++)
-    {
-        //Рандомно определяем куда идти
-        nextMove = randint%2;
-        randint = rand();
-
-        //Если длина секции > макс длины секции -> меняем высоту.
-        if ((nextMove == 0) && (lastHeight > 0) && (sectionWidth > minSectionWidth))
-        {
-            lastHeight--;
-            sectionWidth = 0;
-        }
-        else if ((nextMove == 1) && (lastHeight < MAP_HEIGHT) && (sectionWidth > minSectionWidth) )
-        {
-            lastHeight++;
-            sectionWidth = 0;
-        }
-        //Увеличиваем длину секции
-        sectionWidth++;
-
-        //Заполняем все под нашей высотой землей в два слоя и камнем ниже.
-    
-        map[lastHeight][x] = 1;
-        if (lastHeight + 1 < MAP_HEIGHT){
-            map[lastHeight+1][x] = 2;
-        }
-        if (lastHeight + 2 < MAP_HEIGHT){
-            map[lastHeight+1][x] = 3;
-        }
-        for (int y = lastHeight+2; y < MAP_HEIGHT; y++)
-        {
-            map[y][x] = 6;
-        }
-    }
-
-    return map;
-}
 
 int main()
 {
+    int FREEZE = 0;
+    int EntitiesMAX = 10;
+    Entity* EntitiesList = new Entity[EntitiesMAX];
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
-    // int GLOBAL_SEED = time(0);
-    int GLOBAL_SEED = 1710959590;
+    int GLOBAL_SEED = time(0);
+    // int GLOBAL_SEED = 1710959590;
     srand(GLOBAL_SEED);
 
     
@@ -247,40 +197,60 @@ int main()
 
     // Создание тайлмапа, заполнение пустотой
 
-    int** tilemap = new int*[MAP_HEIGHT];
-    for (int i=0;i!=MAP_HEIGHT;i++){
-        tilemap[i] = new int[MAP_LENGTH];
-    }
+    // int** tilemap = new int*[MAP_HEIGHT];
+    // for (int i=0;i!=MAP_HEIGHT;i++){
+    //     tilemap[i] = new int[MAP_LENGTH];
+    // }
 
-    for (int i= 0;i!=MAP_HEIGHT;i++){
-        for (int j=0;j!=MAP_LENGTH;j++){
-            tilemap[i][j] = 0;
-        }
-    }
-    
-
+    // for (int i= 0;i!=MAP_HEIGHT;i++){
+    //     for (int j=0;j!=MAP_LENGTH;j++){
+    //         tilemap[i][j] = 0;
+    //     }
+    // }
+    Map tilemap(MAP_HEIGHT, MAP_LENGTH, GLOBAL_SEED);
+    Update upd(tilemap,EntitiesList,EntitiesMAX);
     try
     {
-        RandomWalkTopSmoothed(tilemap,SECTIONWIDTH); 
-        WaterFill(tilemap);                          
-        WaterClean(tilemap,7);
-        applyPerlinNoiseInsideStones(tilemap, MAP_LENGTH, MAP_HEIGHT, SEALEVEL);
-        PerlinOre(tilemap, MAP_LENGTH, MAP_HEIGHT, SEALEVEL);
+        
+        // RandomWalkTopSmoothed(tilemap,SECTIONWIDTH); 
+        // WaterFill(tilemap);                          
+        // WaterClean(tilemap,7);
+        // tilemap.PerlinCaves(Air);
+        
+        tilemap.RandomWalkSurface();
+        tilemap.PerlinHights(Stone);
+        tilemap.PerlinCaves(Diamond);
+        tilemap.PerlinCaves(Redstone);
+        tilemap.LiquidStripe(WaterUnder,2.9f,2.f,0.5);
+        tilemap.LiquidStripe(Lava,1.2f,1.3f,0.3);
+
+        // PerlinOre(tilemap, MAP_LENGTH, MAP_HEIGHT, SEALEVEL);
         // for (int i =0;i!=MAP_HEIGHT;i++){
         //     TickWater(tilemap);
         // }
+        
     }
     catch(std::runtime_error err){
         std::cout << "\n" << err.what() << "\n";
     }
     
     sf::View NewZoom;
-    if (PLAYABLE){
-        // NewZoom.setSize(160,90);
-    }
-    NewZoom.setSize(MAP_HEIGHT * tileSize, tileSize*MAP_HEIGHT);
+
+    NewZoom.setSize(MAP_LENGTH * tileSize, tileSize*MAP_LENGTH);
     NewZoom.setCenter(sf::Vector2f(MAP_LENGTH/2*tileSize,MAP_HEIGHT/2*tileSize));
     window.setView(NewZoom);
+    Entity User;
+    if (PLAYABLE)
+    {
+        
+        User.setPosition(sf::Vector2f(MAP_LENGTH/2*tileSize,  tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight()-16));
+        User.setTexture(tileset);
+
+
+        NewZoom.setCenter(User.GetSprite().getPosition());
+        NewZoom.setSize(60*tileSize,60*tileSize);
+        window.setView(NewZoom);
+    }
    
 
     // Замер времени для гладкого перемещения
@@ -305,6 +275,10 @@ int main()
     SeedText.setPosition(MAP_LENGTH/2,0); // Устанавливаем положение
     SeedText.setFillColor(sf::Color::Black); // Устанавливаем цвет текста
 
+    //Игрок
+
+
+
 
 
 
@@ -316,8 +290,10 @@ int main()
         float dtAsSeconds = dt.asSeconds();
 
         // Скорость движения относительно времени 
-        float movement = 250.0f * dtAsSeconds * tileSize/2;
+        float BaseSpeed = 25.0f * dtAsSeconds * tileSize/2;
+        sf::Vector2f movement (0,0);
 
+        int LeftMouseFlag = 0;
         // Обработка событий
         sf::Event event;
         
@@ -327,98 +303,149 @@ int main()
                 window.close();
             if (event.type == event.KeyPressed)
             {
-                if (event.key.scancode == sf::Keyboard::Scan::Escape){
+                if (event.key.scancode == sf::Keyboard::Scan::Escape)
+                {
                     window.clear();
                     DebugNumMode =(DebugNumMode+1)%2;
                 }
+
+
+                if (event.key.scancode == sf::Keyboard::Scan::F){
+                    FREEZE = 1;
+                }
+                if (event.key.scancode == sf::Keyboard::Scan::G){
+                    FREEZE = 0;
+                }
             }
+            if (event.type == sf::Event::MouseButtonPressed){
+                if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0))
+                {
+                    sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
+                    sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
+                    User.GetSprite().setPosition(worldPos);
+                    LeftMouseFlag = 1;
+                }
+            }
+            if (event.type == sf::Event::MouseButtonReleased){
+                if (event.mouseButton.button == sf::Mouse::Left && LeftMouseFlag == 1)
+                {
+                    LeftMouseFlag = 0;
+                }
+            }
+
+            
 
         }
 
         // Нажатия клавиш
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && NewZoom.getSize().x < MAP_LENGTH*tileSize*2)
         {
-            NewZoom.zoom(1.08);
-            window.setView(NewZoom);
+            NewZoom.zoom(1.02);
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && NewZoom.getSize().x > MAP_LENGTH*tileSize/10)
         {
-            NewZoom.zoom(0.92);
-            window.setView(NewZoom);
+            NewZoom.zoom(0.98);
+            // User.GetSprite().setPosition(NewZoom.getCenter());
+
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && NewZoom.getCenter().x > 0)
         {
-            NewZoom.move(-movement, 0);
-            window.setView(NewZoom);
+            movement.x -= BaseSpeed;
+
+
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)&& NewZoom.getCenter().y <MAP_HEIGHT*tileSize)
+        {   
+            movement.y+=BaseSpeed;
+
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)&& NewZoom.getCenter().x < MAP_LENGTH*tileSize)
         {
-            NewZoom.move(0, movement);
-            window.setView(NewZoom);
+            movement.x += BaseSpeed;
+
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)&& NewZoom.getCenter().y > 0)
         {
-            NewZoom.move(movement, 0);
-            window.setView(NewZoom);
+            movement.y-=BaseSpeed;
+
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        User.GetSprite().move(movement);
+        NewZoom.setCenter(User.GetSprite().getPosition());
+        window.setView(NewZoom);
+        // TickWater(tilemap);
+        if (!FREEZE)
         {
-            NewZoom.move(0, -movement);
-            window.setView(NewZoom);
+            upd.tick();
         }
-        TickWater(tilemap);
-        
 
 
 
         // Отрисовка тайлмапа
         window.clear();
+        sf::Vector2f ViewSize = NewZoom.getSize();
+        sf::Vector2f ViewCenter = NewZoom.getCenter();
 
-        for (int y = 0; y < MAP_HEIGHT; ++y)
+        float LoadedXL = (ViewCenter.x - ViewSize.x/2)/tileSize;
+        LoadedXL < 0 ? LoadedXL = 0 : LoadedXL=LoadedXL;
+
+        float LoadedXR = (ViewCenter.x + ViewSize.x/2)/tileSize;
+        LoadedXR > MAP_LENGTH ? LoadedXR = MAP_LENGTH-1 :  LoadedXR=LoadedXR;
+
+        float LoadedYU = (ViewCenter.y - ViewSize.y/2)/tileSize;
+        LoadedYU < 0 ? LoadedYU = 0 : LoadedYU=LoadedYU;
+
+        float LoadedYD = (ViewCenter.y + ViewSize.y/2)/tileSize;
+        LoadedYD > MAP_HEIGHT ? LoadedYD = MAP_HEIGHT-1 :  LoadedYD=LoadedYD;
+
+        // std::cout << "LOADING TILES FROM X = " << LoadedXL << " TO X = " << LoadedXR << "\n";
+        // std::cout << "LOADING TILES FROM Y = " << LoadedYU << " TO Y = " << LoadedYD << "\n";
+    
+        
+
+        for (int y = LoadedYU; y < LoadedYD; ++y)
         {  
-            for (int x = 0; x < MAP_LENGTH; ++x)
+            for (int x = LoadedXL; x < LoadedXR; ++x)
             {
 
                 // Получаем число внутри элемента тайлмапа, обозначающее номер нужной текстурки
-                int tileIndex = tilemap[y][x];
+                int tileIndex = tilemap[y][x].GetTile();
 
                 // Для режима с числами вместо тайлов
-                if (DebugNumMode){
-                // {   if (x%16 ==0 && y%16 ==0)
-                //     {
-                    sf::Text DebugNum;
-                    DebugNum.setFont(font);
-                    DebugNum.setCharacterSize(16);
-                    DebugNum.setPosition(x * tileSize+2, y * tileSize);
-                    DebugNum.setString(std::to_string(tileIndex));
-                    DebugNum.setFillColor(sf::Color::White);
-
-                    window.draw(DebugNum);
-                    // 
-                    continue;
+                if (DebugNumMode)
+                {
+                    // if (x%16 ==0 && y ==0)
+                        {
+                            sf::Text DebugNum;
+                            DebugNum.setFont(font);
+                            DebugNum.setCharacterSize(16);
+                            DebugNum.setPosition(x * tileSize+2, y * tileSize);
+                            DebugNum.setString(std::to_string(tileIndex));
+                            DebugNum.setFillColor(sf::Color::White);
+                            window.draw(DebugNum);
+                            // 
+                            continue;
+                        }
                 }       
 
                 // Отрисовка тайлов
 
                 tiles[tileIndex].setPosition(x * tileSize, y * tileSize);
-                
                 window.draw(tiles[tileIndex]);
             }
         }
+
         
+
+
+        // Вывод ключа генерации 
+        window.draw(User);
+        window.draw(WaterLine);
+
         
-
-
-    // Вывод ключа генерации 
-
-    window.draw(WaterLine);
-
-    
-    window.draw(SeedText);
-    window.display();
+        window.draw(SeedText);
+        window.display();
     }
-
-    delete tilemap;
     return 0;
 }
