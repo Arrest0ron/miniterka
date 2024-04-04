@@ -5,11 +5,10 @@
 #include <iostream>
 #include <cmath>
 #include <ctime>
+#include <vector>
 
-void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT, int SEALEVEL);
-void PerlinOre(int**& map, int MAP_LENGTH, int MAP_HEIGHT, int SEALEVEL);
+
 double perlin(int x, int y);
-
 float smoothNoise(float x, float y);
 float interpolate(float a, float b, float x);
 float interpolatedNoise(float x, float y);
@@ -17,6 +16,10 @@ float interpolatedNoise(float x, float y);
 
 class Update;
 class Entity;
+class Map;
+class Tile;
+class EntityStack;
+class Player;
 
 enum Ore
 {
@@ -82,16 +85,6 @@ public:
     ~Tile(){}
 };
 
-class Update;
-
-// class Entity
-// {
-//  private:
-//     int EntityID;
-//     int Health;
-//     sf::Time OutOfView;
-// };
-
 class Map{
 
 private:
@@ -110,24 +103,7 @@ public:
                 Tiles[i] = new Tile [MAP_LENGTH];
             }
         }
-        int GetGeneratedHeight(int X)
-        {
-            int EncounteredSurface = 0;
-            for(int Y=0;Y != MAP_HEIGHT;Y++)
-            {
-                
-                if (Tiles[Y][X]==6)
-                {
-                    EncounteredSurface = 1;
-                }
-                if (EncounteredSurface && Tiles[Y][X] == 0)
-                {
-                    return Y;
-                }
-            }
-            return MAP_HEIGHT-1;
-        }
-
+        int GetGeneratedHeight(int X);
         int RandomWalkSurface();
         int GetMapHeight()
         {
@@ -142,14 +118,8 @@ public:
             return Tiles;
         }
         int LiquidStripe(Liquid LiquidType,float UpperBoundary, float DownBoundary,float percentage);
-        // int OceanGen();
-        // int LakesGen();
         int PerlinCaves(Ore OreType);
         int PerlinHights(Ore OreType);
-        // int 
-        // int PerlinOres();
-        // int GrassTiles();
-
         Tile* operator[](int Y)
         {
             if (Y<0 || Y >= MAP_HEIGHT){
@@ -157,8 +127,6 @@ public:
             }
             return Tiles[Y];
         }
-
-
         ~Map(){
             for(int i=0; i!= MAP_HEIGHT;i++)
             {
@@ -169,40 +137,58 @@ public:
         friend Update;
 };
 
-class Update{
-    private:
-        Map tilemap;
-        std::unique_ptr<Entity[]> Entities;
-        int EntitiesMAX;
-        void UpdateLiquids();
-        void UpdateFallingTile();
-        void UpdateEntities();
-    public:
-        Update(Map& tiles, Entity* EntityList, int entMAX) : tilemap(tiles), Entities(EntityList), EntitiesMAX(entMAX){}
-        void tick()
-        {
-            UpdateLiquids();
-            // UpdateEntities();
-        }
-        ~Update(){}
-        
-};
 
 class Entity : public sf::Drawable
 {
+private:
+
+    int Health;
+    int ModelHeight;
+    int ModelLength;
+    std::vector<bool> collision;
+    int facing;
+    
+
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
+    {
+        target.draw(m_sprite, states);
+    }
+
+    sf::Sprite m_sprite;
+    friend Update;
+    friend Player;
+    
+
 public:
-    Entity() : Health(100), ModelLength(16), ModelHeight(16) {}
-    Entity(sf::Texture texture) : m_texture(texture){}
+
+    Entity() : Health(100), ModelLength(16), ModelHeight(16), movement(0,0) 
+    {
+        NullCollision();
+        std::cout << "entity created. \n";
+    }
+
+    Entity(sf::Texture texture)
+    {
+        this->setTexture(texture);
+    }
     ~Entity(){}
+    sf::Vector2f movement;
     void setPosition(sf::Vector2f Pos)
     {
-        m_sprite.setPosition(Pos.x,(Pos.y-1));
+        m_sprite.setPosition(Pos.x,(Pos.y));
     }
     void setTexture(sf::Texture texture)
     {
-        m_texture = texture;
-        m_sprite.setTexture(m_texture);
+        m_sprite.setTexture(texture);
         m_sprite.setTextureRect(sf::IntRect(32,0,ModelLength,ModelHeight));
+        
+    }
+    void NullCollision()
+    {
+        for (int i=0;i!=4;i++)
+        {
+            collision.push_back(0);
+        }
     }
     int GetModelLength()
     {
@@ -212,30 +198,74 @@ public:
     {
         return ModelHeight;
     }
-
+    sf::FloatRect getGlobalBounds()
+    {
+        return m_sprite.getGlobalBounds();
+    }
     sf::Sprite& GetSprite()
     {
         return m_sprite;
     }
-
-    float top = m_sprite.getGlobalBounds().top;
-    float down = top + m_sprite.getGlobalBounds().height;
-    float left = m_sprite.getGlobalBounds().left;
-    float right = left + m_sprite.getGlobalBounds().width;
-private:
-    int Health;
-    int ModelHeight;
-    int ModelLength;
-
-
-
-
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
+    std::vector<bool> GetCollision()
     {
-        target.draw(m_sprite, states);
+        return collision;
     }
 
-    sf::Sprite m_sprite;
-    sf::Texture m_texture;
+    friend EntityStack;
+};
+class Player : public Entity
+{
+
+};
+
+class EntityStack
+{
+    Entity* entityStack;
+    int MaxEntityAmount;
+public:
+    EntityStack(int amount, Entity*& stack) : MaxEntityAmount(amount), entityStack(stack){};
+    ~EntityStack()
+    {
+        delete entityStack;
+    }
+    void operator=(EntityStack& Stack)
+    {
+        this->entityStack = Stack.entityStack;
+    }
+    Entity& operator[](int num)
+    {
+        if (num>=MaxEntityAmount)
+        {
+            std::cout << "EntityStack[>MaxSize]";
+            return entityStack[0];
+        }
+        return entityStack[num];
+    }
     friend Update;
+};
+
+
+
+class Update{
+    private:
+        Map tilemap;
+        EntityStack Entities;
+        int EntitiesMAX;
+
+        void UpdateLiquids();
+        void UpdateFallingTile();
+        void UpdateEntities();
+        
+        void Collision(Entity&);
+    public:
+
+        Update(Map& tiles, EntityStack& EntityList, int entMAX, Player& user) : tilemap(tiles), Entities(EntityList), EntitiesMAX(entMAX){}
+        void tick()
+        {
+            UpdateLiquids();
+            UpdateEntities();
+        }
+        void UpdatePlayer(Player& User);
+        ~Update(){}
+        
 };

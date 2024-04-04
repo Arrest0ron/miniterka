@@ -7,109 +7,11 @@ const int MAP_HEIGHT = 300;
 const int MAP_LENGTH = 260;
 const int TILESET_SIZE = 32*32;
 const int TILESET_X = 32;
-const int MIN_SEALEVEL = MAP_HEIGHT/2;
-const int MAX_SEALEVEL = MAP_HEIGHT/2+MAP_HEIGHT*0.05;
 const int SEALEVEL = MAP_HEIGHT / 2;
 const int SECTIONWIDTH = 6;
 
 const bool PLAYABLE = true;
 
-// Возвращает максимальный y на заданном x, на котором не пусто.
-
-int Map::GetSurfaceHeight(int X){
-    if (X >= MAP_LENGTH){
-        throw std::runtime_error("X OVERFLOW");
-    }
-    if (X < 0){
-        throw std::runtime_error("X UNDER 0");
-    }
-
-    for (int Y=0;Y!=MAP_HEIGHT;Y++)
-    {
-        if (Tiles[Y][X] != 0)
-        {
-            return Y;
-        }
-    }
-    return MAP_HEIGHT-1;   
-}
-
-//Наполняет водой всю пустоту ниже SEALEVEL
-// void WaterFill(int**& map)
-// {
-//     for (int x=0;x!=MAP_LENGTH;x++)
-//     {
-//         int maxH = GetMaxHight(map,x);
-//         if (maxH > SEALEVEL)
-//         {
-//             for(int y=SEALEVEL;y!=maxH;y++)
-//             {
-//                 map[y][x] = 4;
-//             }
-//         }
-//     }
-// }
-
-// Считает длину цепочки воды
-// int CalculateSurfaceChain(int**& map,int x){
-//     int WaterCounter{};
-//     for (int i = x;i!=MAP_LENGTH;i++)
-//         {
-//             if (map[GetMaxHight(map,i)][i] == 3)
-//             {
-//                 WaterCounter ++;
-//             } 
-            
-//             else{
-//                 break;
-//             }
-//         }
-//     return WaterCounter;
-// }
-
-// void Map::TickWater(int **& map){
-//     for(int y=0; y !=MAP_HEIGHT;y++)
-//     {
-//         for (int x =0; x!= MAP_LENGTH; x++)
-//         {
-//             if (map[y][x] == 4 || map[y][x] == 5)
-//             {
-//                 if (y < SEALEVEL){
-//                     map[y][x] = 4;
-//                 }
-//                 else
-//                 {
-//                     map[y][x] = 5;
-//                 }
-
-
-
-
-//                 if (y < MAP_HEIGHT-1 && map[y+1][x] == 0)
-//                 {
-//                     std::swap(map[y][x], map[y+1][x]);
-//                 }
-//                 switch (rand()%2)
-//                 {
-//                 case 0:
-//                     if (x > 0 && map[y][x-1] == 0)
-//                     {
-//                         std::swap(map[y][x], map[y][x-1]);
-//                     }
-//                     break;
-//                 case 1:            
-//                     if (x < MAP_LENGTH && map[y][x+1] == 0)
-//                     {
-//                         std::swap(map[y][x], map[y][x+1]);
-//                     }
-//                     break;
-//                 default:
-//                     break;
-//                 }
-//             }
-//         }
-//     }
-// }
 // Убирает слишком маленькие зоны наполнения водой.
 // void WaterClean(int**& map, int MinWaterChainSize = 10)
 // {
@@ -142,13 +44,40 @@ int Map::GetSurfaceHeight(int X){
 //     }
 // }
 
-// RandomWalk для первичной генерации линии поверхности
+void MovementCap(sf::Vector2f& movement)
+{
+    float MOVEMENTCAP = 4.0f;
+    if ((movement.x) && (movement.y))
+    {
+        MOVEMENTCAP/=1.42;
+    }
+    // MOVEMENTCAP = (std::pow(movement.x,2)+std::pow(movement.y,2))
+    if (movement.x > MOVEMENTCAP)
+    {
+        movement.x = MOVEMENTCAP;
+    }
+    if (movement.y > MOVEMENTCAP)
+    {
+        movement.y = MOVEMENTCAP;
+    }
+    if (movement.x < -MOVEMENTCAP)
+    {
+        movement.x = -MOVEMENTCAP;
+    }
+    if (movement.y < -MOVEMENTCAP)
+    {
+        movement.y = -MOVEMENTCAP;
+    }
+
+}
+
 
 int main()
 {
     int FREEZE = 0;
-    int EntitiesMAX = 10;
-    Entity* EntitiesList = new Entity[EntitiesMAX];
+    int EntitiesMAX = 0;
+    Entity* Entities = new Entity[EntitiesMAX];
+    EntityStack EntitiesList(EntitiesMAX,Entities);
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
     int GLOBAL_SEED = time(0);
     // int GLOBAL_SEED = 1710959590;
@@ -194,28 +123,11 @@ int main()
         tiles[i].setTexture(tileset);
         tiles[i].setTextureRect(sf::IntRect(x, y, tileSize, tileSize));
     }
-
-    // Создание тайлмапа, заполнение пустотой
-
-    // int** tilemap = new int*[MAP_HEIGHT];
-    // for (int i=0;i!=MAP_HEIGHT;i++){
-    //     tilemap[i] = new int[MAP_LENGTH];
-    // }
-
-    // for (int i= 0;i!=MAP_HEIGHT;i++){
-    //     for (int j=0;j!=MAP_LENGTH;j++){
-    //         tilemap[i][j] = 0;
-    //     }
-    // }
+    Player User;
     Map tilemap(MAP_HEIGHT, MAP_LENGTH, GLOBAL_SEED);
-    Update upd(tilemap,EntitiesList,EntitiesMAX);
+    Update upd(tilemap,EntitiesList,EntitiesMAX,User);
     try
     {
-        
-        // RandomWalkTopSmoothed(tilemap,SECTIONWIDTH); 
-        // WaterFill(tilemap);                          
-        // WaterClean(tilemap,7);
-        // tilemap.PerlinCaves(Air);
         
         tilemap.RandomWalkSurface();
         tilemap.PerlinHights(Stone);
@@ -223,29 +135,25 @@ int main()
         tilemap.PerlinCaves(Redstone);
         tilemap.LiquidStripe(WaterUnder,2.9f,2.f,0.5);
         tilemap.LiquidStripe(Lava,1.2f,1.3f,0.3);
-
-        // PerlinOre(tilemap, MAP_LENGTH, MAP_HEIGHT, SEALEVEL);
-        // for (int i =0;i!=MAP_HEIGHT;i++){
-        //     TickWater(tilemap);
-        // }
         
     }
+
     catch(std::runtime_error err){
         std::cout << "\n" << err.what() << "\n";
     }
     
     sf::View NewZoom;
-
     NewZoom.setSize(MAP_LENGTH * tileSize, tileSize*MAP_LENGTH);
     NewZoom.setCenter(sf::Vector2f(MAP_LENGTH/2*tileSize,MAP_HEIGHT/2*tileSize));
     window.setView(NewZoom);
-    Entity User;
+
+    
+
     if (PLAYABLE)
     {
         
         User.setPosition(sf::Vector2f(MAP_LENGTH/2*tileSize,  tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight()-16));
         User.setTexture(tileset);
-
 
         NewZoom.setCenter(User.GetSprite().getPosition());
         NewZoom.setSize(60*tileSize,60*tileSize);
@@ -275,12 +183,7 @@ int main()
     SeedText.setPosition(MAP_LENGTH/2,0); // Устанавливаем положение
     SeedText.setFillColor(sf::Color::Black); // Устанавливаем цвет текста
 
-    //Игрок
-
-
-
-
-
+    
 
     // Основной цикл окна
     while (window.isOpen())
@@ -290,8 +193,8 @@ int main()
         float dtAsSeconds = dt.asSeconds();
 
         // Скорость движения относительно времени 
-        float BaseSpeed = 25.0f * dtAsSeconds * tileSize/2;
-        sf::Vector2f movement (0,0);
+        float BaseSpeed = 2.5f * dtAsSeconds * tileSize/2;
+        
 
         int LeftMouseFlag = 0;
         // Обработка событий
@@ -317,21 +220,21 @@ int main()
                     FREEZE = 0;
                 }
             }
-            if (event.type == sf::Event::MouseButtonPressed){
-                if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0))
-                {
-                    sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
-                    sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
-                    User.GetSprite().setPosition(worldPos);
-                    LeftMouseFlag = 1;
-                }
-            }
-            if (event.type == sf::Event::MouseButtonReleased){
-                if (event.mouseButton.button == sf::Mouse::Left && LeftMouseFlag == 1)
-                {
-                    LeftMouseFlag = 0;
-                }
-            }
+            // if (event.type == sf::Event::MouseButtonPressed){
+            //     if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0))
+            //     {
+            //         sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
+            //         sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
+            //         User.GetSprite().setPosition(worldPos);
+            //         LeftMouseFlag = 1;
+            //     }
+            // }
+            // if (event.type == sf::Event::MouseButtonReleased){
+            //     if (event.mouseButton.button == sf::Mouse::Left && LeftMouseFlag == 1)
+            //     {
+            //         LeftMouseFlag = 0;
+            //     }
+            // }
 
             
 
@@ -346,38 +249,85 @@ int main()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && NewZoom.getSize().x > MAP_LENGTH*tileSize/10)
         {
             NewZoom.zoom(0.98);
-            // User.GetSprite().setPosition(NewZoom.getCenter());
-
         }
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && NewZoom.getCenter().x > 0)
         {
-            movement.x -= BaseSpeed;
-
-
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)&& NewZoom.getCenter().y <MAP_HEIGHT*tileSize)
-        {   
-            movement.y+=BaseSpeed;
+            User.movement.x -= BaseSpeed;
 
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)&& NewZoom.getCenter().x < MAP_LENGTH*tileSize)
         {
-            movement.x += BaseSpeed;
+            User.movement.x += BaseSpeed;
 
         }
+        
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)&& NewZoom.getCenter().y <MAP_HEIGHT*tileSize)
+        {   
+            User.movement.y+=BaseSpeed;
 
+        }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)&& NewZoom.getCenter().y > 0)
         {
-            movement.y-=BaseSpeed;
+            User.movement.y-=BaseSpeed;
 
         }
-        User.GetSprite().move(movement);
+        if ((!sf::Keyboard::isKeyPressed(sf::Keyboard::D))&&(!sf::Keyboard::isKeyPressed(sf::Keyboard::A))) 
+        {
+
+            User.movement.x /= 1+BaseSpeed*0.2;
+            if ((-0.01 < User.movement.x) && (User.movement.x< 0.01 ))
+            {
+                User.movement.x = 0;
+            }
+        }
+        if ((!sf::Keyboard::isKeyPressed(sf::Keyboard::W))&&(!sf::Keyboard::isKeyPressed(sf::Keyboard::S))) 
+        {
+            User.movement.y /= 1+BaseSpeed*0.2;
+            if ((-0.01 < User.movement.y) && (User.movement.y< 0.01 ))
+            {
+                User.movement.y = 0;
+            }
+        }
+
+
+
+
+        MovementCap(User.movement);
+
+
+
+
+
+        std::cout << User.GetSprite().getGlobalBounds().left << " " << User.movement.x << "\n";
+
+        if ((User.GetCollision()[0] == 1) && (User.movement.y>0))
+        {
+            User.movement.y=0;
+        }
+        if ((User.GetCollision()[1] == 1) && (User.movement.y<0))
+        {
+            User.movement.y=0;
+        }
+        if ((User.GetCollision()[2] == 1) && (User.movement.x<0))
+        {
+            User.movement.x=0;
+        }
+        if ((User.GetCollision()[3] == 1) && (User.movement.x>0))
+        {
+            User.movement.x=0;
+        }
+        // else(moe)
+        
+        // std::cout << User.getGlobalBounds().top;
+        User.GetSprite().move(User.movement);
         NewZoom.setCenter(User.GetSprite().getPosition());
         window.setView(NewZoom);
-        // TickWater(tilemap);
+
         if (!FREEZE)
         {
             upd.tick();
+            upd.UpdatePlayer(User);
         }
 
 
@@ -417,6 +367,7 @@ int main()
                 {
                     // if (x%16 ==0 && y ==0)
                         {
+                            
                             sf::Text DebugNum;
                             DebugNum.setFont(font);
                             DebugNum.setCharacterSize(16);
@@ -424,6 +375,8 @@ int main()
                             DebugNum.setString(std::to_string(tileIndex));
                             DebugNum.setFillColor(sf::Color::White);
                             window.draw(DebugNum);
+
+
                             // 
                             continue;
                         }
@@ -435,6 +388,13 @@ int main()
                 window.draw(tiles[tileIndex]);
             }
         }
+        sf::Text DebugNumUser;
+        DebugNumUser.setFont(font);
+        DebugNumUser.setCharacterSize(16);
+        DebugNumUser.setPosition(User.getGlobalBounds().left,User.getGlobalBounds().top-tileSize*2);
+        DebugNumUser.setString(std::to_string(User.GetCollision()[0])+ std::to_string(User.GetCollision()[1]) + std::to_string(User.GetCollision()[2])+std::to_string(User.GetCollision()[3]));
+        DebugNumUser.setFillColor(sf::Color::Black);
+        window.draw(DebugNumUser);
 
         
 

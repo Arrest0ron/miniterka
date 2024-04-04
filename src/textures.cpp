@@ -7,44 +7,6 @@ double perlin(int x, int Y)
     return (1.0 - ((n * (n * n * 15731 + 789221 + 3001) + 1376312589) & 0x7fffffff) / 1073741824.0);
 }
 // битовая переменная нужна для прихода к положительному значения, а double для прихода к значению от -1 до 1, хз зачем, так в алгоритмах пишут, что это стандарт. остальные числа для хаотичности
-void applyPerlinNoiseInsideStones(int**& map, int MAP_LENGTH, int MAP_HEIGHT, int SEALEVEL) 
-{
-    double porog = 0.08; // пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
-    std::cout.precision(2);
-    int PERLINKEY_X = rand()%100;
-    int PERLINKEY_Y = rand()%100;
-    for (int Y = 0; Y < MAP_HEIGHT; ++Y) 
-    {
-        for (int x = 0; x < MAP_LENGTH; ++x) 
-        {
-            // std::cout << perlinNoise(x, Y) << " ";
-            float diff = pow((static_cast<float>(Y)/static_cast<float>(SEALEVEL))- 1 ,9);
-            float noise = interpolatedNoise((x)/5.f+ PERLINKEY_X,Y/5.f+PERLINKEY_Y);
-            
-
-
-            if ((noise+diff>= porog) && (map[Y][x] == 6) && (Y > SEALEVEL))
-            {
-                // double noiseValue = perlin(x, Y); // для шума Перлина
-                // std::cout << noiseValue << " ";
-
-                int WaterRand = rand() % 2; // тут я выебываюсь просто
-                if (WaterRand)
-                {
-                    map[Y][x] = 4;
-                }
-                else
-                {
-                    map[Y][x] = 0;
-                }
-
-
-            }
-        }
-
-    }
-}
-
 int Map::PerlinCaves(Ore OreType)
 {
     float porog; // - пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
@@ -148,6 +110,24 @@ int Map::LiquidStripe(Liquid LiquidType,float UpperBoundary, float DownBoundary,
     return 1;
 }
 
+int Map::GetSurfaceHeight(int X){
+    if (X >= MAP_LENGTH){
+        throw std::runtime_error("X OVERFLOW");
+    }
+    if (X < 0){
+        throw std::runtime_error("X UNDER 0");
+    }
+
+    for (int Y=0;Y!=MAP_HEIGHT;Y++)
+    {
+        if (Tiles[Y][X] != 0)
+        {
+            return Y;
+        }
+    }
+    return MAP_HEIGHT-1;   
+}
+
 // Функция для интерполяции шума... интерполяция - вычисление среднего значения. Т.е. выравнивание
 float interpolate(float a, float b, float x) {
     float ft = x * 3.1415927;
@@ -226,6 +206,24 @@ int Map::RandomWalkSurface()
     return 1;
 }
 
+int Map::GetGeneratedHeight(int X)
+{
+    int EncounteredSurface = 0;
+    for(int Y=0;Y != MAP_HEIGHT;Y++)
+    {
+        
+        if (Tiles[Y][X]==6)
+        {
+            EncounteredSurface = 1;
+        }
+        if (EncounteredSurface && Tiles[Y][X] == 0)
+        {
+            return Y;
+        }
+    }
+    return MAP_HEIGHT-1;
+}
+
 void Update::UpdateLiquids(){
     int MapHeight = tilemap.GetMapHeight();
     int MapLength = tilemap.GetMapLength();
@@ -261,13 +259,109 @@ void Update::UpdateLiquids(){
     }
 }
 
-// void Update::UpdateEntities(){
-//     for (int i = 0; i!=EntitiesMAX;i++)
-//     {
-//         Entities[i].GetSprite(
-//     }
-// }
+void Update::UpdateEntities(){
+    for (int i = 0; i!=EntitiesMAX;i++)
+    {
+        Collision(Entities[i]);
+    }
+}
 
+void Update::Collision(Entity& ent)
+    {
+        float topBlock = ent.getGlobalBounds().top-1;
+        float downBlock = topBlock + ent.getGlobalBounds().height+2;
+        float leftBlock = ent.getGlobalBounds().left-1;
+        float rightBlock = leftBlock + ent.getGlobalBounds().width+2;
+        int topBlockI = topBlock/16;
+        int downBlockI = downBlock/16;
+        int leftBlockI = leftBlock/16;
+        int rightBlockI = rightBlock/16;
+
+        float topEntity = ent.getGlobalBounds().top;
+        float downEntity = topEntity + ent.getGlobalBounds().height;
+        float leftEntity = ent.getGlobalBounds().left;
+        float rightEntity = leftEntity + ent.getGlobalBounds().width;
+        int topEntityI = (topEntity+8)/16;
+        int downEntityI = (downEntity-8)/16;
+        int leftEntityI = (leftEntity+8)/16;
+        int rightEntityI = (rightEntity-8)/16;
+
+
+
+
+        std::vector <bool> flag{0,0,0,0};
+        
+        for (int X = leftEntityI; X != rightEntityI+1;X++) 
+        {
+            // if (downBlockI==(tilemap.GetMapHeight()-1))
+            // {
+            //     flag[0] = 1;
+            //     break;
+            // }
+            int IDCheck = tilemap[downBlockI][X].GetTile();
+            if (IDCheck != 0)
+            {
+                flag[0] = 1;
+                break;
+            }
+        }
+
+        ent.collision[0] = flag[0];
+
+        for (int X = leftEntityI; X != rightEntityI+1;X++) 
+        {
+            // if (topBlockI)
+            // {
+                // flag[1] = 1;
+                // break;
+            // }
+            int IDCheck = tilemap[topBlockI][X].GetTile();
+            if (IDCheck != 0)
+            {
+                flag[1] = 1;
+                break;
+            }
+        }
+        ent.collision[1] = flag[1];
+
+        
+        for (int Y = downEntityI; Y != topEntityI-1;Y--) 
+        {
+            // if (!static_cast<int>((ent.getGlobalBounds().left)/16+1))
+            // {
+                // flag[2] = 1;
+                // break;
+            // }
+            int IDCheck = tilemap[Y][leftBlockI].GetTile();
+            if (IDCheck != 0)
+            {
+                flag[2] = 1;
+                break;
+            }
+        }
+        ent.collision[2] = flag[2];
+
+        
+        for (int Y = downEntityI; Y != topEntityI-1;Y--) 
+        {
+            // if (rightBlock >= tilemap.GetMapLength())
+            // {
+                // flag[3] = 1;
+                // break;
+            // }
+            int IDCheck = tilemap[Y][rightBlockI].GetTile();
+            if (IDCheck != 0)
+            {
+                flag[3] = 1;
+                break;
+            }
+        }
+        ent.collision[3] = flag[3];
+    }
+void Update::UpdatePlayer(Player& User)
+{
+    Collision(User);
+}
 
 void Update::UpdateFallingTile()
 {
