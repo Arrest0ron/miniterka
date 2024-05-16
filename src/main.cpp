@@ -78,7 +78,6 @@ bool IsGreaterThenLimit(sf::Vector2f& movement)
 }
 int main()
 {
-
     Entity* Entities = new Entity[EntitiesMAX];
     EntityStack EntitiesList(EntitiesMAX,Entities);
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
@@ -235,21 +234,21 @@ int main()
                     FREEZE = 0;
                 }
             }
-            if (event.type == sf::Event::MouseButtonPressed){
-                if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0))
-                {
-                    sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
-                    sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
-                    User.GetSprite().setPosition(worldPos);
-                    LeftMouseFlag = 1;
-                }
-            }
-            if (event.type == sf::Event::MouseButtonReleased){
-                if (event.mouseButton.button == sf::Mouse::Left && LeftMouseFlag == 1)
-                {
-                    LeftMouseFlag = 0;
-                }
-            }
+            // if (event.type == sf::Event::MouseButtonPressed){
+            //     if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0))
+            //     {
+            //         sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
+            //         sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
+            //         User.GetSprite().setPosition(worldPos);
+            //         LeftMouseFlag = 1;
+            //     }
+            // }
+            // if (event.type == sf::Event::MouseButtonReleased){
+            //     if (event.mouseButton.button == sf::Mouse::Left && LeftMouseFlag == 1)
+            //     {
+            //         LeftMouseFlag = 0;
+            //     }
+            // }
 
             
 
@@ -353,8 +352,11 @@ int main()
             // std::cout << User.getGlobalBounds().top;
             User.GetSprite().move(User.movement.x/50,User.movement.y/50);
         }
-
-
+        
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)&& NewZoom.getCenter().y <MAP_HEIGHT*tileSize)
+        {   
+            User.movement.y+=BaseSpeed;
+        }
         NewZoom.setCenter(User.GetSprite().getPosition());
         window.setView(NewZoom);
 
