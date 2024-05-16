@@ -1,6 +1,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "textures.h"
+<<<<<<< HEAD
 
 
 const int MAP_HEIGHT = 300;
@@ -11,6 +12,14 @@ const int SEALEVEL = MAP_HEIGHT / 2;
 const int SECTIONWIDTH = 6;
 
 const bool PLAYABLE = true;
+=======
+#include "settings.h"
+#include "Map.h"
+#include "Entity.h"
+#include "Update.h"
+
+
+>>>>>>> 5b851c13997a0d7472366e016260d8e236a3b7c4
 
 // Убирает слишком маленькие зоны наполнения водой.
 // void WaterClean(int**& map, int MinWaterChainSize = 10)
@@ -44,6 +53,7 @@ const bool PLAYABLE = true;
 //     }
 // }
 
+<<<<<<< HEAD
 void MovementCap(sf::Vector2f& movement)
 {
     float MOVEMENTCAP = 4.0f;
@@ -71,11 +81,52 @@ void MovementCap(sf::Vector2f& movement)
 
 }
 
+=======
+>>>>>>> 5b851c13997a0d7472366e016260d8e236a3b7c4
 
+// void MovementCap(sf::Vector2f& movement)
+// {
+
+//     if (((movement.x)) && (movement.y))
+//     {
+//         MOVEMENTCAP=pow(pow(movement.x,2) + pow(movement.y,2),1/2);
+//     }
+//     // MOVEMENTCAP = (std::pow(movement.x,2)+std::pow(movement.y,2))
+//     if (movement.x > MOVEMENTCAP)
+//     {
+//         movement.x = MOVEMENTCAP;
+//     }
+//     if (movement.y > MOVEMENTCAP*2)
+//     {
+//         movement.y = MOVEMENTCAP*2;
+//     }
+//     if (movement.x < -MOVEMENTCAP)
+//     {
+//         movement.x = -MOVEMENTCAP;
+//     }
+//     if (movement.y < -MOVEMENTCAP*2)
+//     {
+//         movement.y = -MOVEMENTCAP*2;
+//     }
+
+// }
+
+bool IsGreaterThenLimit(sf::Vector2f& movement)
+{
+    if (pow(pow(movement.x,2) + pow(movement.y,2)/1.2,0.5) >= MOVEMENTCAP)
+    {
+        return 1;
+    }
+    return 0;
+}
 int main()
 {
+<<<<<<< HEAD
     int FREEZE = 0;
     int EntitiesMAX = 0;
+=======
+
+>>>>>>> 5b851c13997a0d7472366e016260d8e236a3b7c4
     Entity* Entities = new Entity[EntitiesMAX];
     EntityStack EntitiesList(EntitiesMAX,Entities);
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
@@ -89,9 +140,21 @@ int main()
     // Создание окна
     sf::RenderWindow window(sf::VideoMode(900, 900), "Tilemap");
 
+    
+    #ifdef WIN32
+        system("chcp 65001");
+        std::string texture_4 = "textures-4.png";
+        std::string arial = "Arial.ttf";
+    #else
+        setlocale(LC_ALL, "Russian");
+        std::string texture_4 = "/home/user/Desktop/Project/images/textures-4.png";
+        std::string arial = "/home/user/Desktop/Project/images/Arial.ttf";
+    #endif
+    
+
     // Загрузка тайлсета
     sf::Texture tileset;
-    if (!tileset.loadFromFile("textures-4.png"))
+    if (!tileset.loadFromFile(texture_4))
     {
         std::cerr << "Failed to load tileset!" << std::endl;
         return -1;
@@ -106,7 +169,7 @@ int main()
 
     // Загружаем шрифт
     sf::Font font;
-    if (!font.loadFromFile("arial.ttf")) {
+    if (!font.loadFromFile(arial)) {
         // Ошибка загрузки шрифта
         return -1;
     }
@@ -193,7 +256,11 @@ int main()
         float dtAsSeconds = dt.asSeconds();
 
         // Скорость движения относительно времени 
+<<<<<<< HEAD
         float BaseSpeed = 2.5f * dtAsSeconds * tileSize/2;
+=======
+        float BaseSpeed = 2.0f * dtAsSeconds * tileSize/2;
+>>>>>>> 5b851c13997a0d7472366e016260d8e236a3b7c4
         
 
         int LeftMouseFlag = 0;
@@ -241,31 +308,123 @@ int main()
         }
 
         // Нажатия клавиш
+        if (User.GetCollision()[0] == 0)
+            {
+                User.movement.y+= BaseSpeed/1.67;
+                User.movement.y = std::min(User.movement.y,MOVEMENTCAP*2);
+            }
+        if (!IsGreaterThenLimit(User.movement))
+        {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && NewZoom.getSize().x < MAP_LENGTH*tileSize*2)
+            {
+                NewZoom.zoom(1.02);
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && NewZoom.getSize().x > MAP_LENGTH*tileSize/100)
+            {
+                NewZoom.zoom(0.98);
+            }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && NewZoom.getSize().x < MAP_LENGTH*tileSize*2)
-        {
-            NewZoom.zoom(1.02);
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) )
+            {
+                User.movement.x -= BaseSpeed;
+
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+            {
+                User.movement.x += BaseSpeed;
+
+            }
+            
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+            {   
+                User.movement.y+=BaseSpeed;
+
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+            {
+                User.movement.y-=BaseSpeed;
+
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (User.GetCollision()[0] == 1))
+            {
+                User.movement.y-=BaseSpeed*30;
+
+            }
+
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && NewZoom.getSize().x > MAP_LENGTH*tileSize/10)
+        if ((!sf::Keyboard::isKeyPressed(sf::Keyboard::D))&&(!sf::Keyboard::isKeyPressed(sf::Keyboard::A))) 
         {
+<<<<<<< HEAD
             NewZoom.zoom(0.98);
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && NewZoom.getCenter().x > 0)
         {
             User.movement.x -= BaseSpeed;
+=======
 
+            User.movement.x /= (1+BaseSpeed*0.2);
+            if ((-0.01 < User.movement.x) && (User.movement.x< 0.01 ))
+            {
+                User.movement.x = 0;
+            }
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)&& NewZoom.getCenter().x < MAP_LENGTH*tileSize)
+        if ((!sf::Keyboard::isKeyPressed(sf::Keyboard::W))&&(!sf::Keyboard::isKeyPressed(sf::Keyboard::S))) 
         {
+            User.movement.y /= (1+BaseSpeed*0.2);
+            if ((-0.01 < User.movement.y) && (User.movement.y< 0.01 ))
+            {
+                User.movement.y = 0;
+            }
+        }
+>>>>>>> 5b851c13997a0d7472366e016260d8e236a3b7c4
+
+
+
+
+
+        // std::cout << std::to_string(User.GetCollision()[0])+ std::to_string(User.GetCollision()[1]) + std::to_string(User.GetCollision()[2])+std::to_string(User.GetCollision()[3]);
+        std::cout << "MOVEMENT: " << pow(pow(User.movement.x,2) + pow(User.movement.y,2),0.5) << "\n";
+
+
+
+
+
+        // std::cout << User.GetSprite().getGlobalBounds().left << " " << User.movement.x << "\n";
+        for (int i =0 ; i != 50; i++)
+        {
+<<<<<<< HEAD
             User.movement.x += BaseSpeed;
 
+=======
+            if ((User.GetCollision()[0] == 1) && (User.movement.y>0))
+            {
+                User.movement.y=-0;
+            }
+            if ((User.GetCollision()[1] == 1) && (User.movement.y<0))
+            {
+                User.movement.y=0;
+            }
+            if ((User.GetCollision()[2] == 1) && (User.movement.x<0))
+            {
+                User.movement.x=0;
+            }
+            if ((User.GetCollision()[3] == 1) && (User.movement.x>0))
+            {
+                User.movement.x=-0;
+            }
+            // else(moe)
+            
+            // std::cout << User.getGlobalBounds().top;
+            User.GetSprite().move(User.movement.x/50,User.movement.y/50);
+>>>>>>> 5b851c13997a0d7472366e016260d8e236a3b7c4
         }
         
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)&& NewZoom.getCenter().y <MAP_HEIGHT*tileSize)
         {   
             User.movement.y+=BaseSpeed;
 
+<<<<<<< HEAD
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)&& NewZoom.getCenter().y > 0)
         {
@@ -321,6 +480,9 @@ int main()
         
         // std::cout << User.getGlobalBounds().top;
         User.GetSprite().move(User.movement);
+=======
+
+>>>>>>> 5b851c13997a0d7472366e016260d8e236a3b7c4
         NewZoom.setCenter(User.GetSprite().getPosition());
         window.setView(NewZoom);
 

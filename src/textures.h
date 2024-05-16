@@ -6,16 +6,28 @@
 #include <cmath>
 #include <ctime>
 #include <vector>
+<<<<<<< HEAD
 
 
 double perlin(int x, int y);
 float smoothNoise(float x, float y);
 float interpolate(float a, float b, float x);
 float interpolatedNoise(float x, float y);
+=======
 
+
+>>>>>>> 5b851c13997a0d7472366e016260d8e236a3b7c4
+
+#include "Tile.h"
+#include "Map.h"
+#include "Update.h"
 
 class Update;
+
+class Map;
+class Tile;
 class Entity;
+<<<<<<< HEAD
 class Map;
 class Tile;
 class EntityStack;
@@ -269,3 +281,16 @@ class Update{
         ~Update(){}
         
 };
+=======
+class EntityStack;
+class Player;
+
+
+
+
+
+
+
+
+
+>>>>>>> 5b851c13997a0d7472366e016260d8e236a3b7c4
