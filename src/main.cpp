@@ -92,9 +92,21 @@ int main()
     // Создание окна
     sf::RenderWindow window(sf::VideoMode(900, 900), "Tilemap");
 
+    
+    #ifdef WIN32
+        system("chcp 65001");
+        std::string texture_4 = "textures-4.png";
+        std::string arial = "Arial.ttf";
+    #else
+        setlocale(LC_ALL, "Russian");
+        std::string texture_4 = "/home/user/Desktop/Project/images/textures-4.png";
+        std::string arial = "/home/user/Desktop/Project/images/Arial.ttf";
+    #endif
+    
+
     // Загрузка тайлсета
     sf::Texture tileset;
-    if (!tileset.loadFromFile("/home/user/Desktop/Project/images/textures-4.png"))
+    if (!tileset.loadFromFile(texture_4))
     {
         std::cerr << "Failed to load tileset!" << std::endl;
         return -1;
@@ -109,7 +121,7 @@ int main()
 
     // Загружаем шрифт
     sf::Font font;
-    if (!font.loadFromFile("/home/user/Desktop/Project/images/Arial.ttf")) {
+    if (!font.loadFromFile(arial)) {
         // Ошибка загрузки шрифта
         return -1;
     }
