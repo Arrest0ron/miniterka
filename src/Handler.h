@@ -3,4 +3,4 @@
 
 sf::Texture TextureSetCreation(const std::string& texture);
 
-sf::Sprite* TileSetCreation(sf::Texture tileset);
+void TileSetCreation(sf::Sprite* tiles, sf::Texture tileset);

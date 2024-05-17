@@ -14,7 +14,27 @@
 
 #include <cmath>
 
-extern int tileSize;
+
+int const TILESET_SIZE = 32*32;
+int TILESET_X = 32;
+int tileSize = 16; // Размер каждого тайла
+const int MAP_HEIGHT = 500;
+const int MAP_LENGTH = 500;
+
+const int SEALEVEL = MAP_HEIGHT / 2;
+const float MOVEMENTCAP = 3.0f;
+
+
+
+const int SECTIONWIDTH = 6;
+const bool PLAYABLE = true;
+
+
+
+
+int FREEZE = 0; // Мир не заморожен с самого начала.
+int EntitiesMAX = 0;
+
 
 // Убирает слишком маленькие зоны наполнения водой.
 // void WaterClean(int**& map, int MinWaterChainSize = 10)
@@ -112,7 +132,17 @@ int main()
 
 
     sf::Texture tileset = TextureSetCreation(texture_4);
-    sf::Sprite* tiles = TileSetCreation(tileset);
+        // Создание спрайтов для каждого тайла из тайлсета
+    sf::Sprite* tiles = new sf::Sprite [32*32];
+
+        // Установка текстур с тайлсета в тайлы
+    for (int i = 0; i < TILESET_SIZE; ++i)
+    {
+        int x = (i % TILESET_X) * tileSize;
+        int y = (i / TILESET_X) * tileSize;
+        tiles[i].setTexture(tileset);
+        tiles[i].setTextureRect(sf::IntRect(x, y, tileSize, tileSize));
+    }
 
     
 
