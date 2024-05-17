@@ -1,5 +1,8 @@
 #pragma once
+
 #include <cmath>
+
+
 double perlin(int x, int Y) 
 {
     int n = x + Y * 2999;

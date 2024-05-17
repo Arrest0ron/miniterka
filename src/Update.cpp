@@ -51,10 +51,10 @@ void Update::UpdateEntities()
 
 void Update::Collision(Entity& ent)
 {
-    float topBlock = ent.getGlobalBounds().top-1;
-    float downBlock = topBlock + ent.getGlobalBounds().height+2;
-    float leftBlock = ent.getGlobalBounds().left-1;
-    float rightBlock = leftBlock + ent.getGlobalBounds().width+2;
+    float topBlock = ent.getGlobalBounds().top;
+    float downBlock = topBlock + ent.getGlobalBounds().height;
+    float leftBlock = ent.getGlobalBounds().left;
+    float rightBlock = leftBlock + ent.getGlobalBounds().width;
     int topBlockI = topBlock/16;
     int downBlockI = downBlock/16;
     int leftBlockI = leftBlock/16;

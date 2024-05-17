@@ -1,6 +1,8 @@
 #pragma once
+
 #include "Tile.h"
 #include <stdexcept>
+
 class Update;
 enum Ore
 {

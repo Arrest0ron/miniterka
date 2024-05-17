@@ -1,12 +1,20 @@
 
 #include <SFML/Graphics.hpp>
-#include "textures.h"
+#include "SFML/Window.hpp"
+
+
+
+
 #include "settings.h"
+
+#include "Handler.h"
 #include "Map.h"
 #include "Entity.h"
 #include "Update.h"
 
+#include <cmath>
 
+extern int tileSize;
 
 // Убирает слишком маленькие зоны наполнения водой.
 // void WaterClean(int**& map, int MinWaterChainSize = 10)
@@ -101,21 +109,14 @@ int main()
         std::string texture_4 = "/home/user/Desktop/Project/images/textures-4.png";
         std::string arial = "/home/user/Desktop/Project/images/Arial.ttf";
     #endif
+
+
+    sf::Texture tileset = TextureSetCreation(texture_4);
+    sf::Sprite* tiles = TileSetCreation(tileset);
+
     
 
-    // Загрузка тайлсета
-    sf::Texture tileset;
-    if (!tileset.loadFromFile(texture_4))
-    {
-        std::cerr << "Failed to load tileset!" << std::endl;
-        return -1;
-    }
-
-    // Создание спрайтов для каждого тайла из тайлсета
-    sf::Sprite tiles[TILESET_SIZE];
     
-
-    int tileSize = 16; // Размер каждого тайла
 
 
     // Загружаем шрифт
@@ -129,17 +130,15 @@ int main()
     int DebugNumMode = 0;
 
 
-    // Установка текстур с тайлсета в тайлы
-    for (int i = 0; i < TILESET_SIZE; ++i)
-    {
-        int x = (i % TILESET_X) * tileSize;
-        int y = (i / TILESET_X) * tileSize;
-        tiles[i].setTexture(tileset);
-        tiles[i].setTextureRect(sf::IntRect(x, y, tileSize, tileSize));
-    }
+
+
+
     Player User;
+
     Map tilemap(MAP_HEIGHT, MAP_LENGTH, GLOBAL_SEED);
+
     Update upd(tilemap,EntitiesList,EntitiesMAX,User);
+
     try
     {
         
@@ -155,7 +154,9 @@ int main()
     catch(std::runtime_error err){
         std::cout << "\n" << err.what() << "\n";
     }
-    
+
+
+    // Создаем поле зрения
     sf::View NewZoom;
     NewZoom.setSize(MAP_LENGTH * tileSize, tileSize*MAP_LENGTH);
     NewZoom.setCenter(sf::Vector2f(MAP_LENGTH/2*tileSize,MAP_HEIGHT/2*tileSize));
@@ -167,7 +168,7 @@ int main()
     {
         
         User.setPosition(sf::Vector2f(MAP_LENGTH/2*tileSize,  tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight()-16));
-        User.setTexture(tileset);
+        // User.setTexture(tileset);
 
         NewZoom.setCenter(User.GetSprite().getPosition());
         NewZoom.setSize(60*tileSize,60*tileSize);
@@ -178,15 +179,6 @@ int main()
     // Замер времени для гладкого перемещения
     sf::Clock clock;
 
-    
-    // Линия уровня воды.
-    sf::VertexArray WaterLine(sf::Lines);
-    sf::Vertex WaterLineStart = (sf::Vector2f(0.f,SEALEVEL*tileSize));
-    sf::Vertex WaterLineEnd = (sf::Vector2f(MAP_LENGTH*tileSize,SEALEVEL*tileSize));
-    WaterLineStart.color = sf::Color::Red;
-    WaterLineEnd.color = sf::Color::Red;
-    WaterLine.append(WaterLineStart);
-    WaterLine.append(WaterLineEnd);
 
     // Текст с ключом генерации мира
 
@@ -322,7 +314,7 @@ int main()
 
 
         // std::cout << std::to_string(User.GetCollision()[0])+ std::to_string(User.GetCollision()[1]) + std::to_string(User.GetCollision()[2])+std::to_string(User.GetCollision()[3]);
-        std::cout << "MOVEMENT: " << pow(pow(User.movement.x,2) + pow(User.movement.y,2),0.5) << "\n";
+        // std::cout << "MOVEMENT: " << pow(pow(User.movement.x,2) + pow(User.movement.y,2),0.5) << "\n";
 
 
 
@@ -333,19 +325,19 @@ int main()
         {
             if ((User.GetCollision()[0] == 1) && (User.movement.y>0))
             {
-                User.movement.y=-0;
+                User.movement.y=-0.05;
             }
             if ((User.GetCollision()[1] == 1) && (User.movement.y<0))
             {
-                User.movement.y=0;
+                User.movement.y=0.05;
             }
             if ((User.GetCollision()[2] == 1) && (User.movement.x<0))
             {
-                User.movement.x=0;
+                User.movement.x=0.05;
             }
             if ((User.GetCollision()[3] == 1) && (User.movement.x>0))
             {
-                User.movement.x=-0;
+                User.movement.x=-0.05;
             }
             // else(moe)
             
@@ -437,7 +429,7 @@ int main()
 
         // Вывод ключа генерации 
         window.draw(User);
-        window.draw(WaterLine);
+
 
         
         window.draw(SeedText);
