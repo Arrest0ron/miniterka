@@ -46,6 +46,7 @@ int Map::PerlinCaves(Ore OreType)
             if ((noise*diff> porog) && (Tiles[Y][x] == 6))
             {
                 Tiles[Y][x] = static_cast<int>(OreType);
+                Tiles[Y][x].SetType(2);
  
             }
         }
@@ -74,6 +75,7 @@ int Map::PerlinHights(Ore OreType)
             if ((noise> porog) && (Tiles[Y][x] == 0))
             {
                 Tiles[Y][x] = static_cast<int>(OreType);
+                Tiles[Y][x].SetType(2);
             }
         }
     }
@@ -160,6 +162,7 @@ int Map::RandomWalkSurface()
         for (int Y = lastHeight; Y < lastHeight+5+RandWidth; Y++)
         {
             Tiles[Y][x] = 6;
+            Tiles[Y][x].SetType(2);
 
         }
 

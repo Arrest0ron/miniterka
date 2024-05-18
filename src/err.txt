@@ -1,0 +1,3 @@
+Map.h:96:13: error: Mismatching allocation and deallocation: Map::Tiles [mismatchAllocDealloc]
+            delete Tiles;
+            ^

@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 class Update;
+
 enum Ore
 {
     Air = 0,
@@ -58,13 +59,7 @@ public:
         int LiquidStripe(Liquid LiquidType,float UpperBoundary, float DownBoundary,float percentage);
         int PerlinCaves(Ore OreType);
         int PerlinHights(Ore OreType);
-        Tile* operator[](int Y)
-        {
-            if (Y<0 || Y >= MAP_HEIGHT){
-                throw std::runtime_error("Y out of bounds.");
-            }
-            return Tiles[Y];
-        }
+        
         ~Map(){
             for(int i=0; i!= MAP_HEIGHT;i++)
             {

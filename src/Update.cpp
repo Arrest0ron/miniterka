@@ -2,9 +2,6 @@
 #include "Entity.h"
 #include <vector>
 
-
-// битовая переменная нужна для прихода к положительному значения, а double для прихода к значению от -1 до 1, хз зачем, так в алгоритмах пишут, что это стандарт. остальные числа для хаотичности
-
 void Update::UpdateLiquids()
 {
     int MapHeight = tilemap.GetMapHeight();
@@ -15,22 +12,22 @@ void Update::UpdateLiquids()
         {
             if (tilemap.Tiles[Y][X].GetType() == 1)
             {
-                if (Y < MapHeight-1 && tilemap[Y+1][X] == 0)
+                if (Y < MapHeight-1 && tilemap.Tiles[Y+1][X] == 0)
                 {
-                    std::swap(tilemap[Y][X], tilemap[Y+1][X]);
+                    std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X]);
                 }
                 switch (rand()%2) 
                 {
                 case 0:
-                    if (X > 0 && tilemap[Y][X-1] == 0)
+                    if (X > 0 && tilemap.Tiles[Y][X-1] == 0)
                     {
-                        std::swap(tilemap[Y][X], tilemap[Y][X-1]);
+                        std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y][X-1]);
                     }
                     break;
                 case 1:            
-                    if (X < MapLength && tilemap[Y][X+1] == 0)
+                    if (X < MapLength && tilemap.Tiles[Y][X+1] == 0)
                     {
-                        std::swap(tilemap[Y][X], tilemap[Y][X+1]);
+                        std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y][X+1]);
                     }
                     break;
                 default:
@@ -50,98 +47,110 @@ void Update::UpdateEntities()
 }
 
 void Update::Collision(Entity& ent)
-{
-    float topBlock = ent.getGlobalBounds().top;
-    float downBlock = topBlock + ent.getGlobalBounds().height;
-    float leftBlock = ent.getGlobalBounds().left;
-    float rightBlock = leftBlock + ent.getGlobalBounds().width;
-    int topBlockI = topBlock/16;
-    int downBlockI = downBlock/16;
-    int leftBlockI = leftBlock/16;
-    int rightBlockI = rightBlock/16;
-
-    float topEntity = ent.getGlobalBounds().top;
-    float downEntity = topEntity + ent.getGlobalBounds().height;
-    float leftEntity = ent.getGlobalBounds().left;
-    float rightEntity = leftEntity + ent.getGlobalBounds().width;
-    int topEntityI = (topEntity)/16;
-    int downEntityI = (downEntity)/16;
-    int leftEntityI = (leftEntity)/16;
-    int rightEntityI = (rightEntity)/16;
-
-
-
-
-    std::vector <bool> flag{0,0,0,0};
-    
-    for (int X = leftEntityI; X != rightEntityI+1;X++) 
+{   
+    // std::cout<<ent.getGlobalBounds().top << "\n";
+    sf::FloatRect Bounds;
+    Bounds = ent.getGlobalBounds();
+    std::vector<float> BlocksAroundCoordinates  // top,down,left,right
     {
-        // if (downBlockI==(tilemap.GetMapHeight()-1))
-        // {
-        //     flag[0] = 1;
-        //     break;
-        // }
-        int IDCheck = tilemap[downBlockI][X].GetTile();
-        if (IDCheck != 0)
-        {
-            flag[0] = 1;
-            break;
-        }
+    Bounds.top-1, Bounds.top -1+ Bounds.height+2,
+    Bounds.left-1,Bounds.left-1+ Bounds.width+2 
+    };
+    std::vector<int> BlocksAroundCoordinatesInt  // top,down,left,right
+    {
+    static_cast<int>(BlocksAroundCoordinates[0]/16), static_cast<int>(BlocksAroundCoordinates[1]/16),
+    static_cast<int>(BlocksAroundCoordinates[2]/16), static_cast<int>(BlocksAroundCoordinates[3]/16)
+    };
+    std::vector<float> EntityCoordinates  // top,down,left,right
+    {
+    Bounds.top, Bounds.top  + Bounds.height,
+    Bounds.left,Bounds.left + Bounds.width
+    };
+    std::vector<int> EntityCoordinatesInt  // top,down,left,right
+    {
+    static_cast<int>(EntityCoordinates[0]/16), static_cast<int>(EntityCoordinates[1]/16),
+    static_cast<int>(EntityCoordinates[2]/16), static_cast<int>(EntityCoordinates[3]/16)
+    };
+
+
+
+
+    std::vector <int> flag{0,0,0,0};
+
+    if (tilemap.Tiles[BlocksAroundCoordinatesInt[0]][EntityCoordinatesInt[2]].GetType() == 2)
+    {
+        flag[0] = 1;
+    }
+    if (tilemap.Tiles[BlocksAroundCoordinatesInt[0]][EntityCoordinatesInt[3]].GetType() == 2)
+    {
+        flag[0] = 1;
+    }
+
+    if (tilemap.Tiles[BlocksAroundCoordinatesInt[1]][EntityCoordinatesInt[2]].GetType() == 2)
+    {
+        flag[1] = 1;
+    }
+    if (tilemap.Tiles[BlocksAroundCoordinatesInt[1]][EntityCoordinatesInt[3]].GetType() == 2)
+    {
+        flag[1] = 1;
+    }
+
+    if (tilemap.Tiles[EntityCoordinatesInt[0]][BlocksAroundCoordinatesInt[2]].GetType() == 2)
+    {
+        flag[2] = 1;
+    }
+    if (tilemap.Tiles[EntityCoordinatesInt[1]][BlocksAroundCoordinatesInt[2]].GetType() == 2)
+    {
+        flag[2] = 1;
+    }
+
+    if (tilemap.Tiles[EntityCoordinatesInt[0]][BlocksAroundCoordinatesInt[3]].GetType() == 2)
+    {
+        flag[3] = 1;
+    }
+    if (tilemap.Tiles[EntityCoordinatesInt[1]][BlocksAroundCoordinatesInt[3]].GetType() == 2)
+    {
+        flag[3] = 1;
+    }
+
+    
+
+
+    if (tilemap.Tiles[EntityCoordinatesInt[0]][EntityCoordinatesInt[2]].GetType() == 2)
+    {
+        flag[0] = 2;
+        flag[2] = 2;
+    }
+    if (tilemap.Tiles[EntityCoordinatesInt[0]][EntityCoordinatesInt[3]].GetType() == 2)
+    {
+        flag[0] = 2;
+        flag[3] = 2;
+    }
+    if (tilemap.Tiles[EntityCoordinatesInt[1]][EntityCoordinatesInt[2]].GetType() == 2)
+    {
+        flag[1] = 2;
+        flag[2] = 2;
+    }
+    if (tilemap.Tiles[EntityCoordinatesInt[1]][EntityCoordinatesInt[3]].GetType() == 2)
+    {
+        flag[1] = 2;
+        flag[3] = 2;
     }
 
     ent.collision[0] = flag[0];
-
-    for (int X = leftEntityI; X != rightEntityI+1;X++) 
-    {
-        // if (topBlockI)
-        // {
-            // flag[1] = 1;
-            // break;
-        // }
-        int IDCheck = tilemap[topBlockI][X].GetTile();
-        if (IDCheck != 0)
-        {
-            flag[1] = 1;
-            break;
-        }
-    }
     ent.collision[1] = flag[1];
-
-    
-    for (int Y = downEntityI; Y != topEntityI-1;Y--) 
-    {
-        // if (!static_cast<int>((ent.getGlobalBounds().left)/16+1))
-        // {
-            // flag[2] = 1;
-            // break;
-        // }
-        int IDCheck = tilemap[Y][leftBlockI].GetTile();
-        if (IDCheck != 0)
-        {
-            flag[2] = 1;
-            break;
-        }
-    }
     ent.collision[2] = flag[2];
-
-    
-    for (int Y = downEntityI; Y != topEntityI-1;Y--) 
-    {
-        // if (rightBlock >= tilemap.GetMapLength())
-        // {
-            // flag[3] = 1;
-            // break;
-        // }
-        int IDCheck = tilemap[Y][rightBlockI].GetTile();
-        if (IDCheck != 0)
-        {
-            flag[3] = 1;
-            break;
-        }
-    }
     ent.collision[3] = flag[3];
+
+    return;
+
+
 }
 
+// void Update::TouchLava(Entity& ent)
+// {
+    
+// }
 
 void Update::UpdatePlayer(Player& User)
 {
@@ -159,22 +168,22 @@ void Update::UpdateFallingTile()
         {
             if (tilemap.Tiles[Y][X].GetType() == 1)
             {
-                if (Y < MapHeight-1 && tilemap[Y+1][X] == 0)
+                if (Y < MapHeight-1 && tilemap.Tiles[Y+1][X] == 0)
                 {
-                    std::swap(tilemap[Y][X], tilemap[Y+1][X]);
+                    std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X]);
                 }
                 switch (rand()%2) 
                 {
                 case 0:
-                    if (X > 0 && tilemap[Y+1][X-1] == 0)
+                    if (X > 0 && tilemap.Tiles[Y+1][X-1] == 0)
                     {
-                        std::swap(tilemap[Y][X], tilemap[Y+1][X-1]);
+                        std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X-1]);
                     }
                     break;
                 case 1:            
-                    if (X < MapLength && tilemap[Y+1][X+1] == 0)
+                    if (X < MapLength && tilemap.Tiles[Y+1][X+1] == 0)
                     {
-                        std::swap(tilemap[Y][X], tilemap[Y+1][X+1]);
+                        std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X+1]);
                     }
                     break;
 

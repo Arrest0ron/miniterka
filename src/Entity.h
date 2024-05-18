@@ -9,13 +9,14 @@ class Update;
 
 class Entity : public sf::Drawable
 {
-private:
+protected:
 
     int Health;
     int ModelHeight;
     int ModelLength;
-    std::vector<bool> collision;
+    std::vector<int> collision;
     int facing;
+    sf::Sprite m_sprite;
     
 
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -23,7 +24,7 @@ private:
         target.draw(m_sprite, states);
     }
 
-    sf::Sprite m_sprite;
+    
     friend Update;
     friend Player;
     
@@ -36,22 +37,35 @@ public:
         std::cout << "entity created. \n";
     }
 
-    Entity(sf::Texture texture)
+    Entity(sf::Texture texture) : Health(100), ModelLength(16), ModelHeight(16), movement(0,0)
     {
-        this->setTexture(texture);
+        NullCollision();
+        // this->setTexture(texture);
+        std::cout << " We are here.";
+
+        sf::Texture EntityTexture;
+        EntityTexture.loadFromFile("/home/user/Documents/GitHub/miniterka/images/MainChar - idle.png");
+        m_sprite.setTextureRect(sf::IntRect(0,0,ModelLength,ModelHeight));
+
+
     }
+    
     ~Entity(){}
+
     sf::Vector2f movement;
+    
     void setPosition(sf::Vector2f Pos)
     {
         m_sprite.setPosition(Pos.x,(Pos.y));
     }
-    void setTexture(sf::Texture texture)
+    
+    void setTexture(sf::Texture& texture)
     {
         m_sprite.setTexture(texture);
-        m_sprite.setTextureRect(sf::IntRect(32,0,ModelLength,ModelHeight));
+        m_sprite.setTextureRect(sf::IntRect(0,0,ModelLength,ModelHeight));
         
     }
+    
     void NullCollision()
     {
         for (int i=0;i!=4;i++)
@@ -59,32 +73,52 @@ public:
             collision.push_back(0);
         }
     }
+    
     int GetModelLength()
     {
         return ModelLength;
     }
+    
     int GetModelHeight()
     {
         return ModelHeight;
     }
+    
     sf::FloatRect getGlobalBounds()
     {
         return m_sprite.getGlobalBounds();
     }
+    
     sf::Sprite& GetSprite()
     {
         return m_sprite;
     }
-    std::vector<bool> GetCollision()
+    
+    std::vector<int> GetCollision()
     {
         return collision;
+    }
+    
+    int GetHealth()
+    {
+        return this->Health;
+    }
+    
+    void ChangeHealth(int AddedHealth)
+    {
+        this->Health += AddedHealth;
     }
 
     friend EntityStack;
 };
+
 class Player : public Entity
 {
-
+public:
+    Player(sf::Texture& text)
+    {
+        std::cout << "Player created.\n";
+    }
 };
 
 class EntityStack
