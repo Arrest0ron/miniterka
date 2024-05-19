@@ -18,6 +18,50 @@ sf::Texture TextureSetCreation(const std::string& texture)
     return tileset;
 }
 
+std::vector<float> GetBlocksAroundCoordinatesFloat(sf::FloatRect& Bounds)
+{ 
+    std::vector<float> BlocksAroundCoordinates  // top,down,left,right
+    {
+    Bounds.top, Bounds.top + Bounds.height,
+    Bounds.left,Bounds.left+ Bounds.width 
+    };
+    return BlocksAroundCoordinates;
+}
+
+std::vector<int>   GetBlocksAroundCoordinatesInt(sf::FloatRect& Bounds)
+{
+    
+    std::vector<float> BlocksAroundCoordinates = GetBlocksAroundCoordinatesFloat(Bounds);
+    std::vector<int>   BlocksAroundCoordinatesInt  // top,down,left,right
+    {
+    static_cast<int>(BlocksAroundCoordinates[0]/16), static_cast<int>(BlocksAroundCoordinates[1]/16),
+    static_cast<int>(BlocksAroundCoordinates[2]/16), static_cast<int>(BlocksAroundCoordinates[3]/16)
+    };
+    return BlocksAroundCoordinatesInt;
+}
+
+std::vector<float> GetEntityCoordinatesFloat(sf::FloatRect& Bounds)
+{ 
+    std::vector<float> EntityCoordinates  // top,down,left,right
+    {
+    Bounds.top, Bounds.top  + Bounds.height,
+    Bounds.left,Bounds.left + Bounds.width
+    };
+    return EntityCoordinates;
+}
+
+std::vector<int>   GetEntityCoordinatesInt(sf::FloatRect& Bounds)
+{
+
+    std::vector<float> EntityCoordinates = GetEntityCoordinatesFloat(Bounds);
+    std::vector<int> EntityCoordinatesInt  // top,down,left,right
+    {
+    static_cast<int>(EntityCoordinates[0]/16), static_cast<int>(EntityCoordinates[1]/16),
+    static_cast<int>(EntityCoordinates[2]/16), static_cast<int>(EntityCoordinates[3]/16)
+    };
+    return EntityCoordinatesInt;
+}
+
 // void TileSetCreation(sf::Sprite* tiles, sf::Texture tileset)
 // {
 
@@ -34,3 +78,4 @@ sf::Texture TextureSetCreation(const std::string& texture)
 //         tiles[i].setTextureRect(sf::IntRect(x, y, tileSize, tileSize));
 //     }
 // }
+

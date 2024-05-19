@@ -129,8 +129,13 @@ public:
     EntityStack(int amount, Entity*& stack) : MaxEntityAmount(amount), entityStack(stack){};
     ~EntityStack()
     {
-        delete entityStack;
+        if (entityStack != nullptr)
+        {
+            delete entityStack;
+        }
+        
     }
+    
     void operator=(EntityStack& Stack)
     {
         this->entityStack = Stack.entityStack;

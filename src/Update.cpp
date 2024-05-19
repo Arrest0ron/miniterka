@@ -1,5 +1,6 @@
 #include "Update.h"
 #include "Entity.h"
+#include "Handler.h"
 #include <vector>
 
 void Update::UpdateLiquids()
@@ -48,93 +49,73 @@ void Update::UpdateEntities()
 
 void Update::Collision(Entity& ent)
 {   
-    // std::cout<<ent.getGlobalBounds().top << "\n";
+
     sf::FloatRect Bounds;
     Bounds = ent.getGlobalBounds();
-    std::vector<float> BlocksAroundCoordinates  // top,down,left,right
-    {
-    Bounds.top-1, Bounds.top -1+ Bounds.height+2,
-    Bounds.left-1,Bounds.left-1+ Bounds.width+2 
-    };
-    std::vector<int> BlocksAroundCoordinatesInt  // top,down,left,right
-    {
-    static_cast<int>(BlocksAroundCoordinates[0]/16), static_cast<int>(BlocksAroundCoordinates[1]/16),
-    static_cast<int>(BlocksAroundCoordinates[2]/16), static_cast<int>(BlocksAroundCoordinates[3]/16)
-    };
-    std::vector<float> EntityCoordinates  // top,down,left,right
-    {
-    Bounds.top, Bounds.top  + Bounds.height,
-    Bounds.left,Bounds.left + Bounds.width
-    };
-    std::vector<int> EntityCoordinatesInt  // top,down,left,right
-    {
-    static_cast<int>(EntityCoordinates[0]/16), static_cast<int>(EntityCoordinates[1]/16),
-    static_cast<int>(EntityCoordinates[2]/16), static_cast<int>(EntityCoordinates[3]/16)
-    };
+    std::vector<float> BlocksAroundCoordinates = GetBlocksAroundCoordinatesFloat(Bounds);
+    std::vector<int> BlocksAroundCoordinatesInt = GetBlocksAroundCoordinatesInt(Bounds);
 
-
-
+    std::vector<float> EntityCoordinates  = GetEntityCoordinatesFloat(Bounds);
+    std::vector<int> EntityCoordinatesInt  = GetEntityCoordinatesInt(Bounds);
 
     std::vector <int> flag{0,0,0,0};
 
-    if (tilemap.Tiles[BlocksAroundCoordinatesInt[0]][EntityCoordinatesInt[2]].GetType() == 2)
-    {
-        flag[0] = 1;
-    }
-    if (tilemap.Tiles[BlocksAroundCoordinatesInt[0]][EntityCoordinatesInt[3]].GetType() == 2)
-    {
-        flag[0] = 1;
-    }
+    // if (tilemap.Tiles[BlocksAroundCoordinatesInt[0]][EntityCoordinatesInt[2]].GetType() == 2)
+    // {
+    //     flag[0] = 1;
+    // }
+    // if (tilemap.Tiles[BlocksAroundCoordinatesInt[0]][EntityCoordinatesInt[3]].GetType() == 2)
+    // {
+    //     flag[0] = 1;
+    // }
 
-    if (tilemap.Tiles[BlocksAroundCoordinatesInt[1]][EntityCoordinatesInt[2]].GetType() == 2)
-    {
-        flag[1] = 1;
-    }
-    if (tilemap.Tiles[BlocksAroundCoordinatesInt[1]][EntityCoordinatesInt[3]].GetType() == 2)
-    {
-        flag[1] = 1;
-    }
+    // if (tilemap.Tiles[BlocksAroundCoordinatesInt[1]][EntityCoordinatesInt[2]].GetType() == 2)
+    // {
+    //     flag[1] = 1;
+    // }
+    // if (tilemap.Tiles[BlocksAroundCoordinatesInt[1]][EntityCoordinatesInt[3]].GetType() == 2)
+    // {
+    //     flag[1] = 1;
+    // }
 
-    if (tilemap.Tiles[EntityCoordinatesInt[0]][BlocksAroundCoordinatesInt[2]].GetType() == 2)
-    {
-        flag[2] = 1;
-    }
-    if (tilemap.Tiles[EntityCoordinatesInt[1]][BlocksAroundCoordinatesInt[2]].GetType() == 2)
-    {
-        flag[2] = 1;
-    }
+    // if (tilemap.Tiles[EntityCoordinatesInt[0]][BlocksAroundCoordinatesInt[2]].GetType() == 2)
+    // {
+    //     flag[2] = 1;
+    // }
+    // if (tilemap.Tiles[EntityCoordinatesInt[1]][BlocksAroundCoordinatesInt[2]].GetType() == 2)
+    // {
+    //     flag[2] = 1;
+    // }
 
-    if (tilemap.Tiles[EntityCoordinatesInt[0]][BlocksAroundCoordinatesInt[3]].GetType() == 2)
-    {
-        flag[3] = 1;
-    }
-    if (tilemap.Tiles[EntityCoordinatesInt[1]][BlocksAroundCoordinatesInt[3]].GetType() == 2)
-    {
-        flag[3] = 1;
-    }
-
-    
+    // if (tilemap.Tiles[EntityCoordinatesInt[0]][BlocksAroundCoordinatesInt[3]].GetType() == 2)
+    // {
+    //     flag[3] = 1;
+    // }
+    // if (tilemap.Tiles[EntityCoordinatesInt[1]][BlocksAroundCoordinatesInt[3]].GetType() == 2)
+    // {
+    //     flag[3] = 1;
+    // }
 
 
     if (tilemap.Tiles[EntityCoordinatesInt[0]][EntityCoordinatesInt[2]].GetType() == 2)
     {
-        flag[0] = 2;
-        flag[2] = 2;
+        flag[0] = 1;
+        flag[2] = 1;
     }
     if (tilemap.Tiles[EntityCoordinatesInt[0]][EntityCoordinatesInt[3]].GetType() == 2)
     {
-        flag[0] = 2;
-        flag[3] = 2;
+        flag[0] = 1;
+        flag[3] = 1;
     }
     if (tilemap.Tiles[EntityCoordinatesInt[1]][EntityCoordinatesInt[2]].GetType() == 2)
     {
-        flag[1] = 2;
-        flag[2] = 2;
+        flag[1] = 1;
+        flag[2] = 1;
     }
     if (tilemap.Tiles[EntityCoordinatesInt[1]][EntityCoordinatesInt[3]].GetType() == 2)
     {
-        flag[1] = 2;
-        flag[3] = 2;
+        flag[1] = 1;
+        flag[3] = 1;
     }
 
     ent.collision[0] = flag[0];
@@ -143,8 +124,6 @@ void Update::Collision(Entity& ent)
     ent.collision[3] = flag[3];
 
     return;
-
-
 }
 
 // void Update::TouchLava(Entity& ent)

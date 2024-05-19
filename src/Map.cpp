@@ -82,7 +82,6 @@ int Map::PerlinHights(Ore OreType)
     return 1;
 }
 
-
 int Map::LiquidStripe(Liquid LiquidType,float UpperBoundary, float DownBoundary, float percentage)
 {
     for (int Y = MAP_HEIGHT/UpperBoundary;Y!=MAP_HEIGHT/DownBoundary && Y<MAP_HEIGHT;++Y)

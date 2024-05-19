@@ -18,8 +18,8 @@
 int const TILESET_SIZE = 32*32;
 int TILESET_X = 32;
 int tileSize = 16; // Размер каждого тайла
-const int MAP_HEIGHT = 200;
-const int MAP_LENGTH = 100;
+const int MAP_HEIGHT = 32;
+const int MAP_LENGTH = 32;
 
 const int SEALEVEL = MAP_HEIGHT / 2;
 const float MOVEMENTCAP = 3.0f;
@@ -29,7 +29,8 @@ const float MOVEMENTCAP = 3.0f;
 const int SECTIONWIDTH = 6;
 const bool PLAYABLE = true;
 
-
+int DebugNumMode = 0;
+int DebugTilesMode = 1;
 
 
 int FREEZE = 0; // Мир не заморожен с самого начала.
@@ -101,7 +102,7 @@ int main()
     }
 
 
-    int DebugNumMode = 0;
+
 
 
     sf::Texture PlayerTexture;
@@ -143,7 +144,7 @@ int main()
     if (PLAYABLE)
     {
         
-        User.setPosition(sf::Vector2f(MAP_LENGTH/2*tileSize,  tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight()-16));
+        User.setPosition(sf::Vector2f(0,  tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight()-16));
         // User.setTexture(tileset);
 
         NewZoom.setCenter(User.GetSprite().getPosition());
@@ -161,12 +162,13 @@ int main()
     // Основной цикл окна
     while (MainWindow.isOpen())
     {
+
         // Получаем время прошлого цикла
         sf::Time dt = clock.restart();
         float dtAsSeconds = dt.asSeconds();
 
         // Скорость движения относительно времени 
-        float BaseSpeed = 2.0f * dtAsSeconds * tileSize/2   ;
+        float BaseSpeed = 2.0f * dtAsSeconds * tileSize/2  ;
         
 
         
@@ -273,7 +275,7 @@ int main()
 
 
         //Движение с учетом коллизии
-        for (int i =0 ; i != 4; i++)
+        for (int i =0 ; i != 50; i++)
         {
             upd.UpdatePlayer(User);
             std::vector<int> calledColl = User.GetCollision();
@@ -310,7 +312,8 @@ int main()
                 User.movement.x=-User.movement.x/3 -0.1;
             }
             
-            User.GetSprite().move(User.movement.x/4,User.movement.y/4);
+            User.GetSprite().move(User.movement.x/50,User.movement.y/50);
+        
             
             
 
@@ -372,17 +375,37 @@ int main()
 
                 tiles[tileIndex].setPosition(x * tileSize, y * tileSize);
                 MainWindow.draw(tiles[tileIndex]);
+                if (tileIndex != 0 && DebugTilesMode)
+                {
+                    sf::Vertex verticesA[4] =
+                    {
+                        sf::Vertex(sf::Vector2f(x*tileSize,(y+1)*tileSize)),
+                        sf::Vertex(sf::Vector2f((x+1)*tileSize,(y+1)*tileSize)),
+                        sf::Vertex(sf::Vector2f((x+1)*tileSize,y*tileSize)),
+                        sf::Vertex(sf::Vector2f(x*tileSize,y*tileSize))
+                        
+
+                    };
+                    verticesA[0].color = sf::Color::Red;
+                    verticesA[1].color = sf::Color::Blue;
+                    verticesA[2].color = sf::Color::Green;
+                    verticesA[3].color = sf::Color::Magenta;
+                    
+                    MainWindow.draw(verticesA, 4, sf::Quads);
+                }
             }
         }
 
         //Отрисовка вспомогательных чисел
         DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top-tileSize*5,std::to_string(User.GetCollision()[0])+ std::to_string(User.GetCollision()[1]) + std::to_string(User.GetCollision()[2])+std::to_string(User.GetCollision()[3]));
         DrawText(MainWindow,font,MAP_LENGTH/2,0,GLOBAL_SEED,24,sf::Color::Black);
-        DrawText(MainWindow,font,MAP_LENGTH/2,0,GLOBAL_SEED,24,sf::Color::Black);
         DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top - tileSize*2,User.GetHealth(),16,gradientRG(100,User.GetHealth()));
         if (!(rand()%100)){User.ChangeHealth(-1);}
         // Отрисовка деталей
+        
         MainWindow.draw(User);
+        // DrawContainingBox(MainWindow,User);
+        DrawContainingBoxInt(MainWindow,User);
         MainWindow.display();
     }
     return 0;
