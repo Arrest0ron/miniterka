@@ -38,7 +38,16 @@ public:
     {
         return Type;
     }
+    
+    int GetDurability()
+    {
+        return this->Durability;
+    }
 
+    int ReduceDurability(int n)
+    {
+        this->Durability -= n;
+    }
     bool operator==(int N)
     {
         return TextureID==N;

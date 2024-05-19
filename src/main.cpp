@@ -18,15 +18,22 @@
 
 
 
-bool IsGreaterThenLimit(sf::Vector2f& movement)
+// bool IsGreaterThenLimitX(sf::Vector2f& movement)
+// {
+//     if (pow(pow(movement.x,2) + pow(movement.y,2)/1.4,0.5) >= MOVEMENTCAP)
+//     {
+//         return 1;
+//     }
+//     return 0;
+// }
+bool IsGreaterThenLimitX(sf::Vector2f& movement)
 {
-    if (pow(pow(movement.x,2) + pow(movement.y,2)/1.4,0.5) >= MOVEMENTCAP)
+    if (pow(movement.x,2) >= MOVEMENTCAP)
     {
         return 1;
     }
     return 0;
 }
-
 int main()
 {
     Entity* Entities = new Entity[EntitiesMAX];
@@ -139,6 +146,9 @@ int main()
 
     // Замер времени для гладкого перемещения
     sf::Clock clock;
+    sf::Clock TimeFLB;
+
+    float TotalTime = 0;
 
 
 
@@ -150,6 +160,8 @@ int main()
         // Получаем время прошлого цикла
         sf::Time dt = clock.restart();
         float dtAsSeconds = dt.asSeconds();
+        
+        TotalTime += dtAsSeconds;
 
         // Скорость движения относительно времени 
         float BaseSpeed = 2.0f * dtAsSeconds * tileSize/2  ;
@@ -161,35 +173,34 @@ int main()
 
         //Гравитация 
         if (User.GetCollision()[1] == 0)
-            {
-                User.movement.y+= BaseSpeed/1.67;
-                User.movement.y = std::min(User.movement.y,MOVEMENTCAP*2);
-            }
-
-        //Движение по клавишам, с учетом предела скорости
-        if (!IsGreaterThenLimit(User.movement))
         {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && NewZoom.getSize().x < MAP_LENGTH*tileSize*2)
-            {
-                NewZoom.zoom(1.02);
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && NewZoom.getSize().x > MAP_LENGTH*tileSize/100)
-            {
-                NewZoom.zoom(0.98);
-            }
+            User.movement.y+= BaseSpeed/1.67;
+            User.movement.y = std::min(User.movement.y,MOVEMENTCAP*2);
+        }
 
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) )
-            {
-                User.movement.x -= BaseSpeed/4 + BaseSpeed/4*3*(abs(User.movement.x)/MOVEMENTCAP);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && NewZoom.getSize().x < MAP_LENGTH*tileSize*2)
+        {
+            NewZoom.zoom(1.02);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && NewZoom.getSize().x > MAP_LENGTH*tileSize/100)
+        {
+            NewZoom.zoom(0.98);
+        }
+        //Движение по клавишам, с учетом предела скорости
 
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-            {
-                User.movement.x += BaseSpeed/4 + BaseSpeed/4*3*(abs(User.movement.x)/MOVEMENTCAP);
 
-            }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && ( (!IsGreaterThenLimitX(User.movement)) || User.movement.x > 0 ))
+        {
+            User.movement.x -= BaseSpeed/3 + BaseSpeed/3*2*(abs(User.movement.x)/MOVEMENTCAP);
 
         }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)&& ( (!IsGreaterThenLimitX(User.movement)) || User.movement.x < 0 ))
+        {
+            User.movement.x += BaseSpeed/3 + BaseSpeed/3*2*(abs(User.movement.x)/MOVEMENTCAP);
+
+        }
+
+        
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (User.GetCollision()[1] == 1))
         {
             User.movement.y-=(BaseSpeed+0.05)*30;
@@ -255,14 +266,43 @@ int main()
             }
             
             User.GetSprite().move(User.movement.x/50,User.movement.y/50);
-        
-            
-            
-
+ 
         }
         
+        UserCursor.UpdatePos(MainWindow);
 
+        int TouchedY = UserCursor.BlockTouched().y;
+        int TouchedX = UserCursor.BlockTouched().x;
+        Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
+        
+        sf::Vertex verticesTouched[5] =
+        {
+		sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16)),
+		sf::Vertex(sf::Vector2f((TouchedX+1)*16,TouchedY*16)),
+		sf::Vertex(sf::Vector2f((TouchedX+1)*16,(TouchedY+1)*16)),
+		sf::Vertex(sf::Vector2f(TouchedX*16,(TouchedY+1)*16)),
+        sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16))
 
+        };
+
+        if ((TimeFLB.getElapsedTime().asSeconds() > 0.3) && (sf::Mouse::isButtonPressed(sf::Mouse::Left)) && (UserCursor.DistanceFromOwner()<6 * tileSize) && (Touched.GetType()!=1) )
+        {
+            if (Touched.GetTile() == 0)
+            {
+                continue;
+            }
+            if (Touched.GetDurability() <= 0)
+            {
+                Touched.SetID(0);
+                Touched.SetType(0);
+                TimeFLB.restart();
+            }
+            else 
+            {
+                Touched.ReduceDurability(5);
+            }
+            
+        }
 
         // std::cout << User.movement.x << "  " << User.movement.y << " \n";
         
@@ -345,26 +385,15 @@ int main()
         DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top-tileSize*5,std::to_string(User.GetCollision()[0])+ std::to_string(User.GetCollision()[1]) + std::to_string(User.GetCollision()[2])+std::to_string(User.GetCollision()[3]));
         DrawText(MainWindow,font,MAP_LENGTH/2,0,GLOBAL_SEED,24,sf::Color::Black);
         DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top - tileSize*2,User.GetHealth(),16,gradientRG(100,User.GetHealth()));
+        
+        
+        DrawText(MainWindow,font,NewZoom.getCenter().x-NewZoom.getSize().x/2,NewZoom.getCenter().y-NewZoom.getSize().y/2,TotalTime,16);
+
         if (!(rand()%100)){User.ChangeHealth(-1);}
         // Отрисовка деталей
         
 
-        UserCursor.UpdatePos(MainWindow);
 
-        int TouchedY = UserCursor.BlockTouched().y;
-        int TouchedX = UserCursor.BlockTouched().x;
-        Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
-        
-        sf::Vertex verticesTouched[5] =
-        {
-		sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16)),
-		sf::Vertex(sf::Vector2f((TouchedX+1)*16,TouchedY*16)),
-		sf::Vertex(sf::Vector2f((TouchedX+1)*16,(TouchedY+1)*16)),
-		sf::Vertex(sf::Vector2f(TouchedX*16,(TouchedY+1)*16)),
-        sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16))
-
-        };
-                
         // Обработка событий
         sf::Event event;
         int LeftMouseFlag = 0;
@@ -389,27 +418,22 @@ int main()
                     FREEZE = 0;
                 }
             }
-            if (event.type == sf::Event::MouseButtonPressed){
-                if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0) && (UserCursor.DistanceFromOwner()<6 * tileSize) && (Touched.GetType()!=1))
-                {
-                    Touched.SetID(0);
-                    Touched.SetType(0);
-                    LeftMouseFlag = 1;
-                }
-            }
-            if (event.type == sf::Event::MouseButtonReleased){
-                if (event.mouseButton.button == sf::Mouse::Left && LeftMouseFlag == 1)
-                {
-                    LeftMouseFlag = 0;
-                }
-            }
+            // if (event.type == sf::Event::MouseButtonPressed){
+            //     if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0) )
+            //     {
 
-            
-
+            //     }
+            // }
+            // if (event.type == sf::Event::MouseButtonReleased){
+            //     if (event.mouseButton.button == sf::Mouse::Left && LeftMouseFlag == 1)
+            //     {
+            //         LeftMouseFlag = 0;
+            //     }
+            // }
         }
 
-        MainWindow.draw(User);
-        MainWindow.draw(verticesTouched,5,sf::LineStrip);
+        MainWindow.draw(User); 
+        MainWindow.draw(verticesTouched,5,sf::LineStrip); // Оверлей выбранного тайла
         // DrawContainingBox(MainWindow,User);
         // DrawContainingBoxInt(MainWindow,User);
         MainWindow.display();
