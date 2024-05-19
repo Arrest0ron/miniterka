@@ -5,7 +5,6 @@
 
 
 
-#include "settings.h"
 
 #include "Handler.h"
 #include "Map.h"
@@ -15,32 +14,13 @@
 #include "Cursor.h"
 #include <cmath>
 
+#include "settings.h"
 
-int const TILESET_SIZE = 32*32;
-int TILESET_X = 32;
-int tileSize = 16; // Размер каждого тайла
-const int MAP_HEIGHT = 320;
-const int MAP_LENGTH = 320;
-
-const int SEALEVEL = MAP_HEIGHT / 2;
-const float MOVEMENTCAP = 3.0f;
-
-
-
-const int SECTIONWIDTH = 6;
-const bool PLAYABLE = true;
-
-int DebugNumMode = 0;
-int DebugTilesMode = 0;
-
-
-int FREEZE = 0; // Мир не заморожен с самого начала.
-int EntitiesMAX = 0;
 
 
 bool IsGreaterThenLimit(sf::Vector2f& movement)
 {
-    if (pow(pow(movement.x,2) + pow(movement.y,2)/1.2,0.5) >= MOVEMENTCAP)
+    if (pow(pow(movement.x,2) + pow(movement.y,2)/1.4,0.5) >= MOVEMENTCAP)
     {
         return 1;
     }
@@ -148,7 +128,7 @@ int main()
     if (PLAYABLE)
     {
         
-        User.setPosition(sf::Vector2f(0,  tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight()-16));
+        User.setPosition(sf::Vector2f(MAP_LENGTH/2*tileSize,  tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight()*2));
         // User.setTexture(tileset);
 
         NewZoom.setCenter(User.GetSprite().getPosition());
@@ -200,12 +180,12 @@ int main()
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) )
             {
-                User.movement.x -= BaseSpeed;
+                User.movement.x -= BaseSpeed/4 + BaseSpeed/4*3*(abs(User.movement.x)/MOVEMENTCAP);
 
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
             {
-                User.movement.x += BaseSpeed;
+                User.movement.x += BaseSpeed/4 + BaseSpeed/4*3*(abs(User.movement.x)/MOVEMENTCAP);
 
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (User.GetCollision()[1] == 1))
@@ -409,7 +389,7 @@ int main()
                 }
             }
             if (event.type == sf::Event::MouseButtonPressed){
-                if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0) && (UserCursor.DistanceFromOwner()<10))
+                if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0) && (UserCursor.DistanceFromOwner()<6 * tileSize))
                 {
                     Touched.SetID(0);
                     Touched.SetType(0);

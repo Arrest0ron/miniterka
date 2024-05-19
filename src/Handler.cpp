@@ -2,10 +2,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>   
 
-
-
-
-
 sf::Texture TextureSetCreation(const std::string& texture)
 {
     // Загрузка тайлсета

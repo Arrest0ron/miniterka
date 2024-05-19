@@ -15,7 +15,7 @@ public:
 	Cursor(Player& User, Map& MapGiven) : Owner(User), map(MapGiven) {}
 	float DistanceFromOwner()
 	{
-		return Owner.getGlobalBounds().top + Owner.getGlobalBounds().height/2, Owner.getGlobalBounds().left + Owner.getGlobalBounds().width/2;
+		return pow(pow((Owner.getGlobalBounds().top + Owner.getGlobalBounds().height/2 - Pos.y),2) +  pow((Owner.getGlobalBounds().left + Owner.getGlobalBounds().width/2 - Pos.x),2),0.5);
 	}
 	void UpdatePos(sf::RenderWindow& window)
 	{
