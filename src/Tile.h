@@ -7,12 +7,13 @@ private:
 
     int TextureID;
     int Type;
+    int Durability;
 
 public:
 
-    Tile(int ID,int type): TextureID(ID), Type(type){}
-    Tile(int ID):          TextureID(ID), Type(0)   {}
-    Tile():                TextureID(0),  Type(0)   {}
+    Tile(int ID,int type): TextureID(ID), Type(type) {}
+    Tile(int ID):          TextureID(ID), Type(0)    {}
+    Tile():                TextureID(0),  Type(0)    {}
 
     void operator=(int n)
     {

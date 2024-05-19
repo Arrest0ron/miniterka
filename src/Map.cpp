@@ -139,18 +139,22 @@ int Map::RandomWalkSurface()
     for (int x = 0; x < MAP_LENGTH; x++)
     {
         //Рандомно определяем куда идти
-        nextMove = randint%2;
+        nextMove = randint%3;
         randint = rand();
 
         //Если длина секции > макс длины секции -> меняем высоту.
-        if ((nextMove == 0) && (lastHeight > 0) && (sectionWidth > minSectionWidth))
+        if ((nextMove == 0) && (lastHeight > 0) && (sectionWidth > minSectionWidth-rand()%3))
         {
             lastHeight--;
             sectionWidth = 0;
         }
-        else if ((nextMove == 1) && (lastHeight < MAP_HEIGHT) && (sectionWidth > minSectionWidth))
+        else if ((nextMove == 1) && (lastHeight < MAP_HEIGHT) && (sectionWidth > minSectionWidth-rand()%3))
         {
             lastHeight++;
+            sectionWidth = 0;
+        }
+        else if ((nextMove == 3) && (lastHeight < MAP_HEIGHT) && (sectionWidth > minSectionWidth-rand()%3))
+        {;
             sectionWidth = 0;
         }
         //Увеличиваем длину секции

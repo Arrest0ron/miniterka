@@ -188,11 +188,12 @@ int main()
                 User.movement.x += BaseSpeed/4 + BaseSpeed/4*3*(abs(User.movement.x)/MOVEMENTCAP);
 
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (User.GetCollision()[1] == 1))
-            {
-                User.movement.y-=(BaseSpeed+0.05)*30;
 
-            }
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (User.GetCollision()[1] == 1))
+        {
+            User.movement.y-=(BaseSpeed+0.05)*30;
+
         }
 
         // Остановка при крайне маленьком движении.
@@ -389,7 +390,7 @@ int main()
                 }
             }
             if (event.type == sf::Event::MouseButtonPressed){
-                if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0) && (UserCursor.DistanceFromOwner()<6 * tileSize))
+                if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0) && (UserCursor.DistanceFromOwner()<6 * tileSize) && (Touched.GetType()!=1))
                 {
                     Touched.SetID(0);
                     Touched.SetType(0);
