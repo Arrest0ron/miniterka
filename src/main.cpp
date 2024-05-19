@@ -111,12 +111,14 @@ int main()
     PlayerTexture.loadFromFile(player);
 
     User.setTexture(PlayerTexture);
-    Cursor UserCursor();
+    
 
     // Создание 
     Map tilemap(MAP_HEIGHT, MAP_LENGTH, GLOBAL_SEED);
 
     Update upd(tilemap,EntitiesList,EntitiesMAX,User);
+
+    Cursor UserCursor(User,tilemap);
 
     try
     {
@@ -173,50 +175,7 @@ int main()
         float BaseSpeed = 2.0f * dtAsSeconds * tileSize/2  ;
         
 
-        
-        // Обработка событий
-        sf::Event event;
-        int LeftMouseFlag = 0;
-        
-        while (MainWindow.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                MainWindow.close();
-            if (event.type == event.KeyPressed)
-            {
-                if (event.key.scancode == sf::Keyboard::Scan::Escape)
-                {
-                    MainWindow.clear();
-                    DebugNumMode =(DebugNumMode+1)%2;
-                }
 
-
-                if (event.key.scancode == sf::Keyboard::Scan::F){
-                    FREEZE = 1;
-                }
-                if (event.key.scancode == sf::Keyboard::Scan::G){
-                    FREEZE = 0;
-                }
-            }
-            if (event.type == sf::Event::MouseButtonPressed){
-                if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0))
-                {
-                    sf::Vector2i pixelPos = sf::Mouse::getPosition(MainWindow);
-                    sf::Vector2f worldPos = MainWindow.mapPixelToCoords(pixelPos);
-                    User.GetSprite().setPosition(worldPos);
-                    LeftMouseFlag = 1;
-                }
-            }
-            if (event.type == sf::Event::MouseButtonReleased){
-                if (event.mouseButton.button == sf::Mouse::Left && LeftMouseFlag == 1)
-                {
-                    LeftMouseFlag = 0;
-                }
-            }
-
-            
-
-        }
 
         // Нажатия клавиш
 
@@ -321,6 +280,9 @@ int main()
 
         }
         
+
+
+
         // std::cout << User.movement.x << "  " << User.movement.y << " \n";
         
         
@@ -405,7 +367,68 @@ int main()
         if (!(rand()%100)){User.ChangeHealth(-1);}
         // Отрисовка деталей
         
+
+        UserCursor.UpdatePos(MainWindow);
+
+        int TouchedY = UserCursor.BlockTouched().y;
+        int TouchedX = UserCursor.BlockTouched().x;
+        Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
+        
+        sf::Vertex verticesTouched[5] =
+        {
+		sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16)),
+		sf::Vertex(sf::Vector2f((TouchedX+1)*16,TouchedY*16)),
+		sf::Vertex(sf::Vector2f((TouchedX+1)*16,(TouchedY+1)*16)),
+		sf::Vertex(sf::Vector2f(TouchedX*16,(TouchedY+1)*16)),
+        sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16))
+
+        };
+                
+        // Обработка событий
+        sf::Event event;
+        int LeftMouseFlag = 0;
+        
+        while (MainWindow.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                MainWindow.close();
+            if (event.type == event.KeyPressed)
+            {
+                if (event.key.scancode == sf::Keyboard::Scan::Escape)
+                {
+                    MainWindow.clear();
+                    DebugNumMode =(DebugNumMode+1)%2;
+                }
+
+
+                if (event.key.scancode == sf::Keyboard::Scan::F){
+                    FREEZE = 1;
+                }
+                if (event.key.scancode == sf::Keyboard::Scan::G){
+                    FREEZE = 0;
+                }
+            }
+            if (event.type == sf::Event::MouseButtonPressed){
+                if ((event.mouseButton.button == sf::Mouse::Left) && (LeftMouseFlag == 0) && (UserCursor.DistanceFromOwner()<10))
+                {
+                    Touched.SetID(0);
+                    Touched.SetType(0);
+                    LeftMouseFlag = 1;
+                }
+            }
+            if (event.type == sf::Event::MouseButtonReleased){
+                if (event.mouseButton.button == sf::Mouse::Left && LeftMouseFlag == 1)
+                {
+                    LeftMouseFlag = 0;
+                }
+            }
+
+            
+
+        }
+
         MainWindow.draw(User);
+        MainWindow.draw(verticesTouched,5,sf::LineStrip);
         // DrawContainingBox(MainWindow,User);
         // DrawContainingBoxInt(MainWindow,User);
         MainWindow.display();

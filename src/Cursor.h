@@ -3,6 +3,8 @@
 #include "Entity.h"
 #include "Map.h"
 #include <SFML/Graphics.hpp>
+#include <cmath>
+
 extern int tileSize;
 class Cursor
 {
@@ -10,12 +12,12 @@ class Cursor
 	Map& map;
 	sf::Vector2f Pos;
 public:
-	Cursor(Player& User, Map MapGiven) : Owner(User), map(MapGiven) {}
-	sf::Vector2f DistanceFromOwner()
+	Cursor(Player& User, Map& MapGiven) : Owner(User), map(MapGiven) {}
+	float DistanceFromOwner()
 	{
-		return sf::Vector2f(Owner.getGlobalBounds().top + Owner.getGlobalBounds().height/2, Owner.getGlobalBounds().left + Owner.getGlobalBounds().width/2);
+		return Owner.getGlobalBounds().top + Owner.getGlobalBounds().height/2, Owner.getGlobalBounds().left + Owner.getGlobalBounds().width/2;
 	}
-	void UpdatePos(sf::RenderWindow window)
+	void UpdatePos(sf::RenderWindow& window)
 	{
 		sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
 		Pos = window.mapPixelToCoords(pixelPos);

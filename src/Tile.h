@@ -21,7 +21,7 @@ public:
 
     void SetID(int n)
     {
-        TextureID=n;
+        this->TextureID=n;
     }
 
     void SetType(int n)
