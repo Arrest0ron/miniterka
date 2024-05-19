@@ -44,8 +44,8 @@ std::vector<float> GetEntityCoordinatesFloat(sf::FloatRect& Bounds)
 { 
     std::vector<float> EntityCoordinates  // top,down,left,right
     {
-    Bounds.top, Bounds.top  + Bounds.height,
-    Bounds.left,Bounds.left + Bounds.width
+    Bounds.top+1, Bounds.top  + Bounds.height-2,
+    Bounds.left+1,Bounds.left + Bounds.width-1
     };
     return EntityCoordinates;
 }

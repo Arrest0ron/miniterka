@@ -60,62 +60,62 @@ void Update::Collision(Entity& ent)
 
     std::vector <int> flag{0,0,0,0};
 
-    // if (tilemap.Tiles[BlocksAroundCoordinatesInt[0]][EntityCoordinatesInt[2]].GetType() == 2)
-    // {
-    //     flag[0] = 1;
-    // }
-    // if (tilemap.Tiles[BlocksAroundCoordinatesInt[0]][EntityCoordinatesInt[3]].GetType() == 2)
-    // {
-    //     flag[0] = 1;
-    // }
+    if (tilemap.Tiles[BlocksAroundCoordinatesInt[0]][EntityCoordinatesInt[2]].GetType() == 2)
+    {
+        flag[0] = 1;
+    }
+    if (tilemap.Tiles[BlocksAroundCoordinatesInt[0]][EntityCoordinatesInt[3]].GetType() == 2)
+    {
+        flag[0] = 1;
+    }
 
-    // if (tilemap.Tiles[BlocksAroundCoordinatesInt[1]][EntityCoordinatesInt[2]].GetType() == 2)
-    // {
-    //     flag[1] = 1;
-    // }
-    // if (tilemap.Tiles[BlocksAroundCoordinatesInt[1]][EntityCoordinatesInt[3]].GetType() == 2)
-    // {
-    //     flag[1] = 1;
-    // }
+    if (tilemap.Tiles[BlocksAroundCoordinatesInt[1]][EntityCoordinatesInt[2]].GetType() == 2)
+    {
+        flag[1] = 1;
+    }
+    if (tilemap.Tiles[BlocksAroundCoordinatesInt[1]][EntityCoordinatesInt[3]].GetType() == 2)
+    {
+        flag[1] = 1;
+    }
 
-    // if (tilemap.Tiles[EntityCoordinatesInt[0]][BlocksAroundCoordinatesInt[2]].GetType() == 2)
-    // {
-    //     flag[2] = 1;
-    // }
-    // if (tilemap.Tiles[EntityCoordinatesInt[1]][BlocksAroundCoordinatesInt[2]].GetType() == 2)
-    // {
-    //     flag[2] = 1;
-    // }
+    if (tilemap.Tiles[EntityCoordinatesInt[0]][BlocksAroundCoordinatesInt[2]].GetType() == 2)
+    {
+        flag[2] = 1;
+    }
+    if (tilemap.Tiles[EntityCoordinatesInt[1]][BlocksAroundCoordinatesInt[2]].GetType() == 2)
+    {
+        flag[2] = 1;
+    }
 
-    // if (tilemap.Tiles[EntityCoordinatesInt[0]][BlocksAroundCoordinatesInt[3]].GetType() == 2)
-    // {
-    //     flag[3] = 1;
-    // }
-    // if (tilemap.Tiles[EntityCoordinatesInt[1]][BlocksAroundCoordinatesInt[3]].GetType() == 2)
-    // {
-    //     flag[3] = 1;
-    // }
+    if (tilemap.Tiles[EntityCoordinatesInt[0]][BlocksAroundCoordinatesInt[3]].GetType() == 2)
+    {
+        flag[3] = 1;
+    }
+    if (tilemap.Tiles[EntityCoordinatesInt[1]][BlocksAroundCoordinatesInt[3]].GetType() == 2)
+    {
+        flag[3] = 1;
+    }
 
 
     if (tilemap.Tiles[EntityCoordinatesInt[0]][EntityCoordinatesInt[2]].GetType() == 2)
     {
-        flag[0] = 1;
-        flag[2] = 1;
+        flag[0] = 2;
+        flag[2] = 2;
     }
     if (tilemap.Tiles[EntityCoordinatesInt[0]][EntityCoordinatesInt[3]].GetType() == 2)
     {
-        flag[0] = 1;
-        flag[3] = 1;
+        flag[0] = 2;
+        flag[3] = 2;
     }
     if (tilemap.Tiles[EntityCoordinatesInt[1]][EntityCoordinatesInt[2]].GetType() == 2)
     {
-        flag[1] = 1;
-        flag[2] = 1;
+        flag[1] = 2;
+        flag[2] = 2;
     }
     if (tilemap.Tiles[EntityCoordinatesInt[1]][EntityCoordinatesInt[3]].GetType() == 2)
     {
-        flag[1] = 1;
-        flag[3] = 1;
+        flag[1] = 2;
+        flag[3] = 2;
     }
 
     ent.collision[0] = flag[0];
