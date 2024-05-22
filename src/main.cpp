@@ -111,11 +111,11 @@ int main()
     {
         
         tilemap.RandomWalkSurface();
-        tilemap.PerlinHights(Stone);
-        tilemap.PerlinCaves(Diamond);
-        tilemap.PerlinCaves(Redstone);
-        tilemap.LiquidStripe(WaterUnder,2.9f,2.f,0.5);
-        tilemap.LiquidStripe(Lava,1.2f,1.3f,0.3);
+        tilemap.PerlinHights("Stone");
+        tilemap.PerlinCaves("Diamond");
+        tilemap.PerlinCaves("Redstone");
+        tilemap.LiquidStripe("WaterUnder",2.9f,2.f,0.5);
+        tilemap.LiquidStripe("Lava",1.2f,1.3f,0.3);
         
     }
 
@@ -273,36 +273,39 @@ int main()
 
         int TouchedY = UserCursor.BlockTouched().y;
         int TouchedX = UserCursor.BlockTouched().x;
-        Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
-        
+                    
+            
         sf::Vertex verticesTouched[5] =
         {
-		sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16)),
-		sf::Vertex(sf::Vector2f((TouchedX+1)*16,TouchedY*16)),
-		sf::Vertex(sf::Vector2f((TouchedX+1)*16,(TouchedY+1)*16)),
-		sf::Vertex(sf::Vector2f(TouchedX*16,(TouchedY+1)*16)),
+        sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16)),
+        sf::Vertex(sf::Vector2f((TouchedX+1)*16,TouchedY*16)),
+        sf::Vertex(sf::Vector2f((TouchedX+1)*16,(TouchedY+1)*16)),
+        sf::Vertex(sf::Vector2f(TouchedX*16,(TouchedY+1)*16)),
         sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16))
 
         };
-
-        if ((TimeFLB.getElapsedTime().asSeconds() > 0.3) && (sf::Mouse::isButtonPressed(sf::Mouse::Left)) && (UserCursor.DistanceFromOwner()<6 * tileSize) && (Touched.GetType()!=1) )
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            if (Touched.GetTile() == 0)
+
+            Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
+            if ((Touched.GetTile() != 0) && (TimeFLB.getElapsedTime().asSeconds() > 0.3) && (UserCursor.DistanceFromOwner()<6 * tileSize) && (Touched.GetType()!=1) )
             {
-                continue;
+
+                if (Touched.GetDurability() <= 0)
+                {
+                    Touched.SetID(0);
+                    Touched.SetType(0);
+                    TimeFLB.restart();
+                }
+                else 
+                {
+                    TimeFLB.restart();
+                    Touched.ReduceDurability(5);
+                }
+                
             }
-            if (Touched.GetDurability() <= 0)
-            {
-                Touched.SetID(0);
-                Touched.SetType(0);
-                TimeFLB.restart();
-            }
-            else 
-            {
-                Touched.ReduceDurability(5);
-            }
-            
         }
+        
 
         // std::cout << User.movement.x << "  " << User.movement.y << " \n";
         

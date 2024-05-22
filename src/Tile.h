@@ -1,5 +1,6 @@
 #pragma once
 
+
 class Tile
 {
 
@@ -13,7 +14,7 @@ public:
 
     Tile(int ID,int type): TextureID(ID), Type(type) {}
     Tile(int ID):          TextureID(ID), Type(0)    {}
-    Tile():                TextureID(0),  Type(0)    {}
+    Tile():                TextureID(0),  Type(0), Durability(0)    {}
 
     void operator=(int n)
     {
@@ -44,7 +45,7 @@ public:
         return this->Durability;
     }
 
-    int ReduceDurability(int n)
+    void ReduceDurability(int n)
     {
         this->Durability -= n;
     }

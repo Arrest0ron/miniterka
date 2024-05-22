@@ -2,27 +2,30 @@
 
 #include "Tile.h"
 #include <stdexcept>
+#include <map>
+#include <string>
 
 class Update;
 
-enum Ore
-{
-    Air = 0,
-    // Copper = 1,
-    // Lead = 2,
-    Stone = 6,
-    Diamond = 7,
-    Redstone = 8
+// enum Ore
+// {
+//     Air = 0,
+//     // Copper = 1,
+//     // Lead = 2,
+//     Stone = 6,
+//     Diamond = 7,
+//     Redstone = 8
     
-};
+// };
 
-enum Liquid
-{
-    WaterUnder = 5,
-    WaterOver = 4,
-    Lava = 9
+// enum Liquid
+// {
+//     WaterUnder = 5,
+//     WaterOver = 4,
+//     Lava = 9
 
-};
+// };
+
 
 class Map{
 
@@ -56,9 +59,9 @@ public:
         Tile**& ReturnTiles(){
             return Tiles;
         }
-        int LiquidStripe(Liquid LiquidType,float UpperBoundary, float DownBoundary,float percentage);
-        int PerlinCaves(Ore OreType);
-        int PerlinHights(Ore OreType);
+        int LiquidStripe(const std::string& LiquidType,float UpperBoundary, float DownBoundary,float percentage);
+        int PerlinCaves(const std::string& OreType);
+        int PerlinHights(const std::string& OreType);
         
         ~Map(){
             for(int i=0; i!= MAP_HEIGHT;i++)

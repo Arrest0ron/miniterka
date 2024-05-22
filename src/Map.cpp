@@ -1,28 +1,76 @@
 #include "Map.h"
 #include "Perlin.h"
+#include <iostream>
 
-int Map::PerlinCaves(Ore OreType)
+
+
+
+
+struct BlocksData
+{
+    unsigned ID;
+    unsigned Durability;
+    unsigned Type;
+}; 
+
+BlocksData BlocksINF[16]
+{
+    {0,0,0},
+    {1,0,0},
+    {2,0,0},
+    {3,0,0},
+    {4,0,0},
+    {5,0,0},
+    {6,1000,0},
+    {7,3000,0},
+    {8,2000,0},
+    {9,0,0}
+
+};
+
+ std::map<std::string,BlocksData> BlocksMap {
+    {"Air", BlocksINF[0]},
+    // {"-", 1},
+    // {"--", 2},
+    // {"---", 3},
+    {"WaterOver", BlocksINF[4]},
+    {"WaterUnder", BlocksINF[5]},
+    {"Stone", BlocksINF[6]},
+    {"Diamond", BlocksINF[7]},
+    {"Redstone", BlocksINF[8]},
+    {"Lava", BlocksINF[9]},
+    // {"----", 10},
+    // {"-----", 11}
+};
+
+int Map::PerlinCaves(const std::string& OreType)
 {
     float porog; // - пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
     float Interpolation;
     float HightDiff = 1.f;
-    switch (OreType)
+    int a =  BlocksMap[OreType].ID;
+    std::cout << a;
+    switch (BlocksMap[OreType].ID)
     {
-    case Diamond:
+    case 7:
+    //"Diamond"
         porog = 0.9;
         Interpolation = 2.f;
         HightDiff = 1.5f;
         break;
-    case Redstone:
+    case 8:
+    //"Redstone":
         porog = 0.4;
         Interpolation = 4.f;
         break;
-    case Air:
+    case 0:
+    //"Air":
         porog = 0.0f;
         Interpolation = 2.5f;
         HightDiff = 2;
         break;
-    case Stone:
+    case 6:
+    //Stone:
         porog = 0.0f;
         Interpolation = 2.5f;
     default:
@@ -45,8 +93,10 @@ int Map::PerlinCaves(Ore OreType)
 
             if ((noise*diff> porog) && (Tiles[Y][x] == 6))
             {
-                Tiles[Y][x] = static_cast<int>(OreType);
+                Tiles[Y][x] = BlocksMap[OreType].ID;
+                
                 Tiles[Y][x].SetType(2);
+                // std::cout << OreType << " " << Tiles[Y][x].GetTile() << " \n";
  
             }
         }
@@ -55,7 +105,7 @@ int Map::PerlinCaves(Ore OreType)
     return 1;
 }
 
-int Map::PerlinHights(Ore OreType)
+int Map::PerlinHights(const std::string& OreType)
 {
     float porog; // - пороговое значение для шума перлина, вероятность того, что будет сгенерировано другое число, то есть - вероятность изменения текстуры
     float Interpolation;
@@ -74,7 +124,7 @@ int Map::PerlinHights(Ore OreType)
             float noise = interpolatedNoise((x+PERLINKEY_X)/Interpolation,(Y+PERLINKEY_Y)/Interpolation);
             if ((noise> porog) && (Tiles[Y][x] == 0))
             {
-                Tiles[Y][x] = static_cast<int>(OreType);
+                Tiles[Y][x] = BlocksMap[OreType].ID;
                 Tiles[Y][x].SetType(2);
             }
         }
@@ -82,7 +132,7 @@ int Map::PerlinHights(Ore OreType)
     return 1;
 }
 
-int Map::LiquidStripe(Liquid LiquidType,float UpperBoundary, float DownBoundary, float percentage)
+int Map::LiquidStripe(const std::string& LiquidType,float UpperBoundary, float DownBoundary, float percentage)
 {
     for (int Y = MAP_HEIGHT/UpperBoundary;Y!=MAP_HEIGHT/DownBoundary && Y<MAP_HEIGHT;++Y)
     {
@@ -91,7 +141,7 @@ int Map::LiquidStripe(Liquid LiquidType,float UpperBoundary, float DownBoundary,
         
             if ((Tiles[Y][X] == 0) && (static_cast<float>(rand()%101)/100 <= percentage))
             {
-                Tiles[Y][X].SetID(static_cast<int>(LiquidType));
+                Tiles[Y][X].SetID(BlocksMap[LiquidType].ID);
                 Tiles[Y][X].SetType(1);
             }
         }
