@@ -52,7 +52,7 @@ int main()
     // Выбор расположения файлов для разных ос
     #ifdef WIN32
         system("chcp 65001");
-        std::string player = "Player.png";
+        std::string player = "char_01.png";
         std::string texture_4 = "textures-4.png";
         std::string arial = "Arial.ttf";
     #else
@@ -284,8 +284,18 @@ int main()
         sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16))
 
         };
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && (TimeFLB.getElapsedTime().asSeconds() > 0.3) )
         {
+            if (( TouchedX <0) || (TouchedX>MAP_LENGTH))
+            {
+                TimeFLB.restart();
+                continue;
+            }
+            if (( TouchedY <0) || (TouchedY>MAP_HEIGHT))
+            {
+                TimeFLB.restart();
+                continue;
+            }
 
             Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
             if ((Touched.GetTile() != 0) && (TimeFLB.getElapsedTime().asSeconds() > 0.3) && (UserCursor.DistanceFromOwner()<6 * tileSize) && (Touched.GetType()!=1) )
