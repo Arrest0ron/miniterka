@@ -277,15 +277,21 @@ int main()
             
         sf::Vertex verticesTouched[5] =
         {
-        sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16)),
-        sf::Vertex(sf::Vector2f((TouchedX+1)*16,TouchedY*16)),
-        sf::Vertex(sf::Vector2f((TouchedX+1)*16,(TouchedY+1)*16)),
-        sf::Vertex(sf::Vector2f(TouchedX*16,(TouchedY+1)*16)),
-        sf::Vertex(sf::Vector2f(TouchedX*16,TouchedY*16))
+        sf::Vertex(sf::Vector2f(TouchedX*tileSize,TouchedY*tileSize)),
+        sf::Vertex(sf::Vector2f((TouchedX+1)*tileSize,TouchedY*tileSize)),
+        sf::Vertex(sf::Vector2f((TouchedX+1)*tileSize,(TouchedY+1)*tileSize)),
+        sf::Vertex(sf::Vector2f(TouchedX*tileSize,(TouchedY+1)*tileSize)),
+        sf::Vertex(sf::Vector2f(TouchedX*tileSize,TouchedY*tileSize))
 
         };
+
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && (TimeFLB.getElapsedTime().asSeconds() > 0.3) )
         {
+            verticesTouched[0].color = sf::Color::Red;
+            verticesTouched[1].color = sf::Color::Blue;
+            verticesTouched[2].color = sf::Color::Green;
+            verticesTouched[3].color = sf::Color::Magenta;
+            verticesTouched[4].color = sf::Color::Red;
             if (( TouchedX <0) || (TouchedX>MAP_LENGTH))
             {
                 TimeFLB.restart();
@@ -300,6 +306,7 @@ int main()
             Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
             if ((Touched.GetTile() != 0) && (TimeFLB.getElapsedTime().asSeconds() > 0.3) && (UserCursor.DistanceFromOwner()<6 * tileSize) && (Touched.GetType()!=1) )
             {
+
 
                 if (Touched.GetDurability() <= 0)
                 {
@@ -397,10 +404,10 @@ int main()
         //Отрисовка вспомогательных чисел
         DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top-tileSize*5,std::to_string(User.GetCollision()[0])+ std::to_string(User.GetCollision()[1]) + std::to_string(User.GetCollision()[2])+std::to_string(User.GetCollision()[3]));
         DrawText(MainWindow,font,MAP_LENGTH/2,0,GLOBAL_SEED,24,sf::Color::Black);
-        DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top - tileSize*2,User.GetHealth(),16,gradientRG(100,User.GetHealth()));
+        DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top - tileSize*2,User.GetHealth(),tileSize,gradientRG(100,User.GetHealth()));
         
         
-        DrawText(MainWindow,font,NewZoom.getCenter().x-NewZoom.getSize().x/2,NewZoom.getCenter().y-NewZoom.getSize().y/2,TotalTime,16);
+        DrawText(MainWindow,font,NewZoom.getCenter().x-NewZoom.getSize().x/2,NewZoom.getCenter().y-NewZoom.getSize().y/2,TotalTime,tileSize);
 
         if (!(rand()%100)){User.ChangeHealth(-1);}
         // Отрисовка деталей

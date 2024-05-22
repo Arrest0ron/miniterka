@@ -3,21 +3,21 @@
 #include <SFML/Graphics.hpp>
 extern int tileSize;
 template<class T>
-void DrawText(sf::RenderWindow& window,sf::Font& font,float x,float y, T Text,int size = 16, sf::Color Color = sf::Color::White)
+void DrawText(sf::RenderWindow& window,sf::Font& font,float x,float y, T Text,int size = tileSize, sf::Color Color = sf::Color::White)
 {
 	sf::Text DrawableText;
 	DrawableText.setFont(font);
-	DrawableText.setCharacterSize(16);
+	DrawableText.setCharacterSize(tileSize);
 	DrawableText.setPosition(x, y);
 	DrawableText.setString(std::to_string(Text));
 	DrawableText.setFillColor(Color);
 	window.draw(DrawableText);
 }
-void DrawText(sf::RenderWindow& window,sf::Font& font,float x,float y, std::string Text,int size = 16, sf::Color Color = sf::Color::White)
+void DrawText(sf::RenderWindow& window,sf::Font& font,float x,float y, std::string Text,int size = tileSize, sf::Color Color = sf::Color::White)
 {
 	sf::Text DrawableText;
 	DrawableText.setFont(font);
-	DrawableText.setCharacterSize(16);
+	DrawableText.setCharacterSize(tileSize);
 	DrawableText.setPosition(x, y);
 	DrawableText.setString(Text);
 	DrawableText.setFillColor(Color);
@@ -45,10 +45,10 @@ void DrawContainingBoxInt(sf::RenderWindow& window, Entity& ent)
 
 	sf::Vertex vertices[4] =
 	{
-		sf::Vertex(sf::Vector2f(EntityCoordinatesInt[2]*16,EntityCoordinatesInt[0]*16)),
-		sf::Vertex(sf::Vector2f(EntityCoordinatesInt[3]*16,EntityCoordinatesInt[0]*16)),
-		sf::Vertex(sf::Vector2f(EntityCoordinatesInt[2]*16,EntityCoordinatesInt[1]*16)),
-		sf::Vertex(sf::Vector2f(EntityCoordinatesInt[3]*16,EntityCoordinatesInt[1]*16))
+		sf::Vertex(sf::Vector2f(EntityCoordinatesInt[2]*tileSize,EntityCoordinatesInt[0]*tileSize)),
+		sf::Vertex(sf::Vector2f(EntityCoordinatesInt[3]*tileSize,EntityCoordinatesInt[0]*tileSize)),
+		sf::Vertex(sf::Vector2f(EntityCoordinatesInt[2]*tileSize,EntityCoordinatesInt[1]*tileSize)),
+		sf::Vertex(sf::Vector2f(EntityCoordinatesInt[3]*tileSize,EntityCoordinatesInt[1]*tileSize))
 
 	};
 	window.draw(vertices, 4, sf::Quads);

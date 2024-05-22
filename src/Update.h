@@ -17,7 +17,8 @@ private:
     void UpdateLiquids();
     void UpdateFallingTile();
     void UpdateEntities();
-    void Collision(Entity&);
+    void Collision(Entity& ent);
+    void Direction(Entity& ent);
 public:
 
     Update(Map& tiles, EntityStack& EntityList, int entMAX, Player& user) : tilemap(tiles), Entities(EntityList), EntitiesMAX(entMAX){}

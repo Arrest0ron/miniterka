@@ -2,6 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream> 
 
+extern int tileSize;
+
 class Entity;
 class EntityStack;
 class Player;
@@ -15,7 +17,7 @@ protected:
     int ModelHeight;
     int ModelLength;
     std::vector<int> collision;
-    int facing;
+    bool facing;
     sf::Sprite m_sprite;
     
 
@@ -31,23 +33,21 @@ protected:
 
 public:
 
-    Entity() : Health(100), ModelLength(16), ModelHeight(16), movement(0,0) 
+    Entity() : Health(100), ModelLength(tileSize), ModelHeight(tileSize), movement(0,0) 
     {
         NullCollision();
         std::cout << "entity created. \n";
     }
 
-    Entity(sf::Texture texture) : Health(100), ModelLength(16), ModelHeight(16), movement(0,0)
+    Entity(sf::Texture texture) : Health(100), ModelLength(tileSize), ModelHeight(tileSize), movement(0,0)
     {
         NullCollision();
         // this->setTexture(texture);
         std::cout << " We are here.";
 
         sf::Texture EntityTexture;
-        EntityTexture.loadFromFile("/home/user/Documents/GitHub/miniterka/images/MainChar - idle.png");
+
         m_sprite.setTextureRect(sf::IntRect(0,0,ModelLength,ModelHeight));
-
-
     }
     
     ~Entity(){}

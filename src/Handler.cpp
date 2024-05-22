@@ -1,6 +1,8 @@
 #include "Handler.h"    
 #include <SFML/Graphics.hpp>
 #include <iostream>   
+// #include "settings.h"
+extern int tileSize;
 
 sf::Texture TextureSetCreation(const std::string& texture)
 {
@@ -30,8 +32,8 @@ std::vector<int>   GetBlocksAroundCoordinatesInt(sf::FloatRect& Bounds)
     std::vector<float> BlocksAroundCoordinates = GetBlocksAroundCoordinatesFloat(Bounds);
     std::vector<int>   BlocksAroundCoordinatesInt  // top,down,left,right
     {
-    static_cast<int>(BlocksAroundCoordinates[0]/16), static_cast<int>(BlocksAroundCoordinates[1]/16),
-    static_cast<int>(BlocksAroundCoordinates[2]/16), static_cast<int>(BlocksAroundCoordinates[3]/16)
+    static_cast<int>(BlocksAroundCoordinates[0]/tileSize), static_cast<int>(BlocksAroundCoordinates[1]/tileSize),
+    static_cast<int>(BlocksAroundCoordinates[2]/tileSize), static_cast<int>(BlocksAroundCoordinates[3]/tileSize)
     };
     return BlocksAroundCoordinatesInt;
 }
@@ -52,8 +54,8 @@ std::vector<int>   GetEntityCoordinatesInt(sf::FloatRect& Bounds)
     std::vector<float> EntityCoordinates = GetEntityCoordinatesFloat(Bounds);
     std::vector<int> EntityCoordinatesInt  // top,down,left,right
     {
-    static_cast<int>(EntityCoordinates[0]/16), static_cast<int>(EntityCoordinates[1]/16),
-    static_cast<int>(EntityCoordinates[2]/16), static_cast<int>(EntityCoordinates[3]/16)
+    static_cast<int>(EntityCoordinates[0]/tileSize), static_cast<int>(EntityCoordinates[1]/tileSize),
+    static_cast<int>(EntityCoordinates[2]/tileSize), static_cast<int>(EntityCoordinates[3]/tileSize)
     };
     return EntityCoordinatesInt;
 }
