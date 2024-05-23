@@ -12,6 +12,7 @@
 #include "Update.h"
 #include "Drawing.h"
 #include "Cursor.h"
+#include "Dynamics.h"
 #include <cmath>
 
 #include "settings.h"
@@ -62,25 +63,13 @@ int main()
         std::string arial = "/home/user/Documents/GitHub/miniterka/images/Arial.ttf";
     #endif
 
-
+    //Загружаем текстуры
     sf::Texture tileset;
-    tileset.loadFromFile(texture_4);
-        // Создание спрайтов для каждого тайла из тайлсета
-    sf::Sprite tiles [TILESET_SIZE];
-
-        // Установка текстур с тайлсета в тайлы
-    for (int i = 0; i < TILESET_SIZE; ++i)
+    if (!tileset.loadFromFile(texture_4)) 
     {
-        int x = (i % TILESET_X) * tileSize;
-        int y = (i / TILESET_X) * tileSize;
-        tiles[i].setTexture(tileset);
-        tiles[i].setTextureRect(sf::IntRect(x, y, tileSize, tileSize));
+        // Ошибка загрузки текстур
+        return -1;
     }
-
-    
-
-    
-
 
     // Загружаем шрифт
     sf::Font font;
@@ -90,22 +79,25 @@ int main()
     }
 
 
-
-
+    // Игрок 
 
     sf::Texture PlayerTexture;
-    Player User(tileset);
     PlayerTexture.loadFromFile(player);
 
+    Player User(tileset);
     User.setTexture(PlayerTexture);
+    User.GetSprite().setTextureRect(sf::IntRect(0,0,User.GetModelLength(),User.GetModelHeight()));
     
 
-    // Создание 
+    // Карта, обработчик и курсор пользователя
+
     Map tilemap(MAP_HEIGHT, MAP_LENGTH, GLOBAL_SEED);
 
     Update upd(tilemap,EntitiesList,EntitiesMAX,User);
 
     Cursor UserCursor(User,tilemap);
+
+    // Генерируем карту
 
     try
     {
@@ -120,40 +112,49 @@ int main()
         
     }
 
+    // Информация об ошибке
+
     catch(std::runtime_error err){
         std::cout << "\n" << err.what() << "\n";
     }
 
 
-    // Создаем поле зрения
+    // Создаем поле зрения пользователя
     sf::View NewZoom;
-    NewZoom.setSize(MAP_LENGTH * tileSize, tileSize*MAP_LENGTH);
-    NewZoom.setCenter(sf::Vector2f(MAP_LENGTH/2*tileSize,MAP_HEIGHT/2*tileSize));
+
+
+    float userY = tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight();
+    float userX = MAP_LENGTH/2*tileSize;
+    User.setPosition(sf::Vector2f(userX,  userY));
+
+
+
+    NewZoom.setCenter(User.GetSprite().getPosition());
+    NewZoom.setSize(User.GetModelLength()*tileSize,User.GetModelHeight()*tileSize);
     MainWindow.setView(NewZoom);
 
-    
-
-    if (PLAYABLE)
-    {
-        float userY = tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight();
-        float userX = MAP_LENGTH/2*tileSize;
-        User.setPosition(sf::Vector2f(userX,  userY));
-        // User.setTexture(tileset);
-
-        NewZoom.setCenter(User.GetSprite().getPosition());
-        NewZoom.setSize(User.GetModelLength()*60*tileSize,60*User.GetModelHeight()*tileSize);
-        MainWindow.setView(NewZoom);
-    }
    
 
-    // Замер времени для гладкого перемещения
+    // Замер времени для гладкого перемещения и поломки блоков
     sf::Clock clock;
     sf::Clock TimeFLB;
 
+
+    // Суммарное время открытого окна
     float TotalTime = 0;
 
 
+    // Массив для отрисовки примитивов - тайлов квадратной формы
+    sf::VertexArray MAP(sf::PrimitiveType::Quads) ;
+    
 
+    // Состояние для отрисовки текстур примитивов
+    sf::RenderStates states;
+    states.texture = &tileset;
+
+    double D_FPS = 0;
+    int FPS;
+    int Frames = 0;
 
     // Основной цикл окна
     while (MainWindow.isOpen())
@@ -170,7 +171,7 @@ int main()
         
 
 
-
+        ViewDynamics(NewZoom);
         // Нажатия клавиш
 
         //Гравитация 
@@ -180,14 +181,6 @@ int main()
             User.movement.y = std::min(User.movement.y,MOVEMENTCAP*2);
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && NewZoom.getSize().x < MAP_LENGTH*tileSize*2)
-        {
-            NewZoom.zoom(1.02);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && NewZoom.getSize().x > MAP_LENGTH*tileSize/100)
-        {
-            NewZoom.zoom(0.98);
-        }
         //Движение по клавишам, с учетом предела скорости
 
 
@@ -366,57 +359,58 @@ int main()
     
         
         // Тайлы и дебаг отрисовка
-        sf::VertexArray MAP(sf::PrimitiveType::Quads) ;
-        MAP.resize(MAP_LENGTH*MAP_HEIGHT*4);
 
+        Tile** TileArray = tilemap.ReturnTiles();
+        
+
+
+
+        MAP.resize((LoadedYU - LoadedYD)*(LoadedXL-LoadedXR)*4);
         for (int y = LoadedYU; y < LoadedYD; ++y)
         {  
             for (int x = LoadedXL; x < LoadedXR; ++x)
             {
 
-                // Получаем число внутри элемента тайлмапа, обозначающее номер нужной текстурки
-                int tileIndex = tilemap.ReturnTiles()[y][x].GetTile();
+                sf::Vertex* quad = &MAP[((x-LoadedXL) + (y-LoadedYU) * (LoadedXR-LoadedXL)) * 4];
+                // define its 4 corners
+                int tu = TileArray[y][x].GetTile();
+                quad[0].position = sf::Vector2f(x * tileSize, y * tileSize);
+                quad[1].position = sf::Vector2f((x + 1) * tileSize, y * tileSize);
+                quad[2].position = sf::Vector2f((x + 1) * tileSize, (y + 1) * tileSize);
+                quad[3].position = sf::Vector2f(x * tileSize, (y + 1) * tileSize);
 
-                // Для режима с числами вместо тайлов
-                if (DebugNumMode)
-                {
-                    DrawText(MainWindow,font,x * tileSize + 2,y*tileSize,tileIndex);
-                    continue;
-                }       
-
-                // Отрисовка тайлов
-
-                tiles[tileIndex].setPosition(x * tileSize, y * tileSize);
-                MainWindow.draw(tiles[tileIndex]);
-                if ( DebugTilesMode && tileIndex != 0)
-                {
-                    sf::Vertex verticesA[4] =
-                    {
-                        sf::Vertex(sf::Vector2f(x*tileSize,(y+1)*tileSize)),
-                        sf::Vertex(sf::Vector2f((x+1)*tileSize,(y+1)*tileSize)),
-                        sf::Vertex(sf::Vector2f((x+1)*tileSize,y*tileSize)),
-                        sf::Vertex(sf::Vector2f(x*tileSize,y*tileSize))
-                        
-
-                    };
-                    verticesA[0].color = sf::Color::Red;
-                    verticesA[1].color = sf::Color::Blue;
-                    verticesA[2].color = sf::Color::Green;
-                    verticesA[3].color = sf::Color::Magenta;
-                    
-                    MainWindow.draw(verticesA, 4, sf::Quads);
-                }
+                quad[0].texCoords = sf::Vector2f(tu * tileSize, 0);
+                quad[1].texCoords = sf::Vector2f((tu + 1) * tileSize, 0);
+                quad[2].texCoords = sf::Vector2f((tu + 1) * tileSize, tileSize);
+                quad[3].texCoords = sf::Vector2f(tu * tileSize, tileSize);
+                
             }
         }
+        
+        MainWindow.draw(MAP,states);
+
+        // Отрисовка кадра зафиксирована и учтена в FPS
+        D_FPS += dtAsSeconds;
+        Frames +=1;
+        if (Frames == 60)
+        {
+            FPS = round(Frames/D_FPS);
+            Frames=0;
+            D_FPS = 0;
+        }
+
+
+
 
         //Отрисовка вспомогательных чисел
         DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top-tileSize*5,std::to_string(User.GetCollision()[0])+ std::to_string(User.GetCollision()[1]) + std::to_string(User.GetCollision()[2])+std::to_string(User.GetCollision()[3]));
         DrawText(MainWindow,font,MAP_LENGTH/2,0,GLOBAL_SEED,24,sf::Color::Black);
         DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top - tileSize*2,User.GetHealth(),tileSize,gradientRG(100,User.GetHealth()));
         
-        
-        DrawText(MainWindow,font,NewZoom.getCenter().x-NewZoom.getSize().x/2,NewZoom.getCenter().y-NewZoom.getSize().y/2,TotalTime,tileSize);
 
+
+        DrawText(MainWindow,font,NewZoom.getCenter().x-NewZoom.getSize().x/2,NewZoom.getCenter().y-NewZoom.getSize().y/2,FPS,tileSize*NewZoom.getSize().x*NewZoom.getSize().y);
+        
         if (!(rand()%100)){User.ChangeHealth(-1);}
         // Отрисовка деталей
         
@@ -425,6 +419,8 @@ int main()
         // Обработка событий
         sf::Event event;
         int LeftMouseFlag = 0;
+
+        
         
         while (MainWindow.pollEvent(event))
         {
@@ -465,6 +461,7 @@ int main()
         // DrawContainingBox(MainWindow,User);
         // DrawContainingBoxInt(MainWindow,User);
         MainWindow.display();
+        
     }
     return 0;
 }
