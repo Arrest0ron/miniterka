@@ -104,7 +104,7 @@ public:
         return this->Health;
     }
     
-    void ChangeHealth(int AddedHealth)
+    void AddHealth(int AddedHealth)
     {
         this->Health += AddedHealth;
     }
@@ -114,11 +114,16 @@ public:
 
 class Player : public Entity
 {
+private:
+    unsigned score;
 public:
     Player(sf::Texture& text)
     {
         std::cout << "Player created.\n";
     }
+    int GetScore() const {return this->score;}
+    void SetScore(const int n) {this->score = n;}
+    void IncreaseScore(const int n) {this->score += n;}
 };
 
 class EntityStack

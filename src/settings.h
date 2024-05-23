@@ -8,7 +8,7 @@ const int MAP_HEIGHT = 250;
 const int MAP_LENGTH = 1000;
 
 const int SEALEVEL = MAP_HEIGHT / 2;
-const float MOVEMENTCAP = 2.0f;
+const float MOVEMENTCAP = 8.0f;
 
 
 

@@ -4,13 +4,13 @@
 #include <vector>
 #include <iostream>
 
-void Update::UpdateLiquids()
+void Update::UpdateLiquids(std::vector<int>& Loaded)
 {
     int MapHeight = tilemap.GetMapHeight();
     int MapLength = tilemap.GetMapLength();
-    for (int Y=0; Y!=MapHeight;Y++)
+    for (int Y=Loaded[0]; Y!=Loaded[1];Y++)
     {
-        for (int X=0;X!=MapLength;X++)
+        for (int X=Loaded[2];X!=Loaded[3];X++)
         {
             if (tilemap.Tiles[Y][X].GetType() == 1)
             {

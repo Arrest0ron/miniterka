@@ -10,11 +10,11 @@ class Player;
 class Update
 {
 private:
-    Map tilemap;
-    EntityStack Entities;
+    Map& tilemap;
+    EntityStack& Entities;
     int EntitiesMAX;
 
-    void UpdateLiquids();
+    void UpdateLiquids(std::vector<int>& Loaded);
     void UpdateFallingTile();
     void UpdateEntities();
     void Collision(Entity& ent);
@@ -22,9 +22,9 @@ private:
 public:
 
     Update(Map& tiles, EntityStack& EntityList, int entMAX, Player& user) : tilemap(tiles), Entities(EntityList), EntitiesMAX(entMAX){}
-    void tick()
+    void tick(std::vector<int>& Loaded)
     {
-        UpdateLiquids();
+        UpdateLiquids(Loaded);
         UpdateEntities();
     }
     void UpdatePlayer(Player& User);

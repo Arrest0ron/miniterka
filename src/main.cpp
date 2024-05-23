@@ -49,6 +49,7 @@ int main()
 
     // Создание окна
     sf::RenderWindow MainWindow(sf::VideoMode(900, 900), "Tilemap");
+    MainWindow.setFramerateLimit(60);
 
     // Выбор расположения файлов для разных ос
     #ifdef WIN32
@@ -167,7 +168,7 @@ int main()
         TotalTime += dtAsSeconds;
 
         // Скорость движения относительно времени 
-        float BaseSpeed = 2.0f * dtAsSeconds * tileSize/2  ;
+        float BaseSpeed = 2.0f * dtAsSeconds * tileSize  ;
         
 
 
@@ -177,8 +178,8 @@ int main()
         //Гравитация 
         if (User.GetCollision()[1] == 0)
         {
-            User.movement.y+= BaseSpeed/1.67;
-            User.movement.y = std::min(User.movement.y,MOVEMENTCAP*2);
+            User.movement.y+= BaseSpeed*1.67;
+            User.movement.y = std::min(User.movement.y,MOVEMENTCAP*4);
         }
 
         //Движение по клавишам, с учетом предела скорости
@@ -199,7 +200,6 @@ int main()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (User.GetCollision()[1] == 1))
         {
             User.movement.y-=(BaseSpeed+0.05)*30;
-
         }
 
         // Остановка при крайне маленьком движении.
@@ -223,7 +223,7 @@ int main()
 
 
         //Движение с учетом коллизии
-        for (int i =0 ; i != 50; i++)
+        for (int i =0 ; i != 8; i++)
         {
             upd.UpdatePlayer(User);
             std::vector<int> calledColl = User.GetCollision();
@@ -260,7 +260,7 @@ int main()
                 User.movement.x=-User.movement.x/3 -0.1;
             }
             
-            User.GetSprite().move(User.movement.x/50,User.movement.y/50);
+            User.GetSprite().move(User.movement.x/8,User.movement.y/8);
  
         }
         
@@ -295,17 +295,22 @@ int main()
             else if (( TouchedY <1) || (TouchedY>=(MAP_HEIGHT-1)))
             {
                 TimeFLB.restart();
-
             }
             else
             {
                 Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
                 if ((Touched.GetTile() != 0) && (TimeFLB.getElapsedTime().asSeconds() > 0.3) && (UserCursor.DistanceFromOwner()<6 * tileSize) && (Touched.GetType()!=1) )
                 {
-
-
                 if (Touched.GetDurability() <= 0)
                 {
+                    if (Touched.GetTile()== BlocksMap["Diamond"].ID)
+                    {
+                        User.IncreaseScore(50);
+                    }
+                    if (Touched.GetTile()== BlocksMap["Redstone"].ID)
+                    {
+                        User.IncreaseScore(10);
+                    }
                     Touched.SetBlock(BlocksMap["Air"]);
                     TimeFLB.restart();
                 }
@@ -328,11 +333,6 @@ int main()
         NewZoom.setCenter(User.GetSprite().getPosition());
         MainWindow.setView(NewZoom);
 
-        if (FREEZE)
-        {
-            upd.tick();
-            
-        }
 
 
 
@@ -357,7 +357,12 @@ int main()
         // std::cout << "LOADING TILES FROM X = " << LoadedXL << " TO X = " << LoadedXR << "\n";
         // std::cout << "LOADING TILES FROM Y = " << LoadedYU << " TO Y = " << LoadedYD << "\n";
     
-        
+        if (FREEZE)
+        {
+            upd.tick(Loaded);
+            
+        }
+
         // Тайлы и дебаг отрисовка
 
         Tile** TileArray = tilemap.ReturnTiles();
@@ -372,7 +377,7 @@ int main()
             {
 
                 sf::Vertex* quad = &MAP[((x-LoadedXL) + (y-LoadedYU) * (LoadedXR-LoadedXL)) * 4];
-                // define its 4 corners
+
                 int tu = TileArray[y][x].GetTile();
                 quad[0].position = sf::Vector2f(x * tileSize, y * tileSize);
                 quad[1].position = sf::Vector2f((x + 1) * tileSize, y * tileSize);
@@ -403,15 +408,13 @@ int main()
 
 
         //Отрисовка вспомогательных чисел
-        DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top-tileSize*5,std::to_string(User.GetCollision()[0])+ std::to_string(User.GetCollision()[1]) + std::to_string(User.GetCollision()[2])+std::to_string(User.GetCollision()[3]));
+        // DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top-tileSize*5,std::to_string(User.GetCollision()[0])+ std::to_string(User.GetCollision()[1]) + std::to_string(User.GetCollision()[2])+std::to_string(User.GetCollision()[3]));
         DrawText(MainWindow,font,MAP_LENGTH/2,0,GLOBAL_SEED,24,sf::Color::Black);
-        DrawText(MainWindow,font,User.getGlobalBounds().left,User.getGlobalBounds().top - tileSize*2,User.GetHealth(),tileSize,gradientRG(100,User.GetHealth()));
-        
-
-
+        DrawText(MainWindow,font,User.getGlobalBounds().left-tileSize*0.5,User.getGlobalBounds().top - tileSize*2,User.GetHealth(),tileSize,gradientRG(100,User.GetHealth()));
+        DrawText(MainWindow,font,User.getGlobalBounds().left-tileSize*0.5,User.getGlobalBounds().top - tileSize*1,User.GetScore(),tileSize,sf::Color::Green);
         DrawText(MainWindow,font,NewZoom.getCenter().x-NewZoom.getSize().x/2,NewZoom.getCenter().y-NewZoom.getSize().y/2,FPS,tileSize*NewZoom.getSize().x*NewZoom.getSize().y);
         
-        if (!(rand()%100)){User.ChangeHealth(-1);}
+        if (!(rand()%100)){}
         // Отрисовка деталей
         
 
