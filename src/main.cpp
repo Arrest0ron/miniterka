@@ -110,12 +110,12 @@ int main()
     try
     {
         
-        tilemap.RandomWalkSurface();
-        tilemap.PerlinHights("Stone");
-        tilemap.PerlinCaves("Diamond");
-        tilemap.PerlinCaves("Redstone");
-        tilemap.LiquidStripe("WaterUnder",2.9f,2.f,0.5);
-        tilemap.LiquidStripe("Lava",1.2f,1.3f,0.3);
+        // tilemap.RandomWalkSurface();
+        tilemap.PerlinHights("Air");
+        // tilemap.PerlinCaves("Diamond");
+        // tilemap.PerlinCaves("Redstone");
+        // tilemap.LiquidStripe("WaterUnder",2.9f,2.f,0.5);
+        // tilemap.LiquidStripe("Lava",1.2f,1.3f,0.3);
         
     }
 
@@ -134,8 +134,9 @@ int main()
 
     if (PLAYABLE)
     {
-        
-        User.setPosition(sf::Vector2f(MAP_LENGTH/2*tileSize,  tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight()*2));
+        float userY = tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight()*2;
+        userY = 50;
+        User.setPosition(sf::Vector2f(MAP_LENGTH/2*tileSize,  userY));
         // User.setTexture(tileset);
 
         NewZoom.setCenter(User.GetSprite().getPosition());
@@ -172,11 +173,11 @@ int main()
         // Нажатия клавиш
 
         //Гравитация 
-        if (User.GetCollision()[1] == 0)
-        {
-            User.movement.y+= BaseSpeed/1.67;
-            User.movement.y = std::min(User.movement.y,MOVEMENTCAP*2);
-        }
+        // if (User.GetCollision()[1] == 0)
+        // {
+        //     User.movement.y+= BaseSpeed/1.67;
+        //     User.movement.y = std::min(User.movement.y,MOVEMENTCAP*2);
+        // }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && NewZoom.getSize().x < MAP_LENGTH*tileSize*2)
         {
@@ -295,12 +296,12 @@ int main()
             if (( TouchedX <0) || (TouchedX>MAP_LENGTH))
             {
                 TimeFLB.restart();
-                continue;
+
             }
             if (( TouchedY <0) || (TouchedY>MAP_HEIGHT))
             {
                 TimeFLB.restart();
-                continue;
+
             }
 
             Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
@@ -310,15 +311,15 @@ int main()
 
                 if (Touched.GetDurability() <= 0)
                 {
-                    Touched.SetID(0);
-                    Touched.SetType(0);
+                    Touched.SetBlock(BlocksMap["Air"]);
                     TimeFLB.restart();
                 }
-                else 
-                {
-                    TimeFLB.restart();
-                    Touched.ReduceDurability(5);
-                }
+                // else 
+                // {
+                //     TimeFLB.restart();
+                //     // Touched.ReduceDurability(5);
+                //     std::cout << Touched.GetDurability();
+                // }
                 
             }
         }

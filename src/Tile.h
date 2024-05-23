@@ -1,62 +1,93 @@
 #pragma once
 
+#include <map>
+#include <string>
+#include "Blocks.h"
+#include <iostream>
 
+extern BlocksData BlocksINF[16];
+extern std::map<std::string,BlocksData> BlocksMap;
 class Tile
 {
 
 private: 
 
-    int TextureID;
-    int Type;
-    int Durability;
+    BlocksData& Data;
 
 public:
 
-    Tile(int ID,int type): TextureID(ID), Type(type) {}
-    Tile(int ID):          TextureID(ID), Type(0)    {}
-    Tile():                TextureID(0),  Type(0), Durability(0)    {}
+    Tile () :  Data(BlocksINF[0]) 
+    {
+        // std::cout << "null ";
+
+        
+    }
+    Tile(BlocksData& data):     Data(data)    {std::cout << "data ";}
+
 
     void operator=(int n)
     {
-        TextureID = n;
+        this->Data= BlocksINF[n];
+        std::cout<< this->Data.ID;
+    }
+    void operator=(BlocksData& data)
+    {
+        this->Data = data;
+        std::cout<< this->Data.ID;
+    }
+    Tile(Tile* other) : Data(other->Data)
+    {
+        this->Data = other->Data;
+        std::cout << "other ";
     }
 
     void SetID(int n)
     {
-        this->TextureID=n;
+        this->Data= BlocksINF[n];
+        std::cout<< this->Data.ID;
     }
-
-    void SetType(int n)
+    void SetBlock(BlocksData& data)
     {
-        Type = n;
+        this->Data = BlocksINF[0];
+        std::cout<< this->Data.ID;
     }
 
     int GetTile(){
-        return TextureID;
+        return Data.ID;
     }
 
     int GetType()
     {
-        return Type;
+        return Data.Type;
     }
     
     int GetDurability()
     {
-        return this->Durability;
+        return 0;
     }
 
-    void ReduceDurability(int n)
-    {
-        this->Durability -= n;
-    }
     bool operator==(int N)
     {
-        return TextureID==N;
+        return Data.ID==N;
     }
-
+    bool operator==(BlocksData& N)
+    {
+        return Data.ID==N.ID;
+    }
     bool operator!=(int N)
     {
-        return TextureID!=N;
+        return Data.ID!=N;
+    }
+    bool operator!=(BlocksData& N)
+    {
+        return Data.ID!=N.ID;
+    }
+    friend void SwapTiles(Tile& one, Tile& two)
+    {
+        std::cout<< one.Data.ID;
+        BlocksData& inter = one.Data;
+        one.Data = two.Data;
+        two.Data = inter;
     }
 
     ~Tile(){}

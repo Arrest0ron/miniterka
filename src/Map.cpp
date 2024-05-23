@@ -1,47 +1,13 @@
 #include "Map.h"
 #include "Perlin.h"
 #include <iostream>
+#include "Tile.h"
 
 
 
 
 
-struct BlocksData
-{
-    unsigned ID;
-    unsigned Durability;
-    unsigned Type;
-}; 
 
-BlocksData BlocksINF[16]
-{
-    {0,0,0},
-    {1,0,0},
-    {2,0,0},
-    {3,0,0},
-    {4,0,0},
-    {5,0,0},
-    {6,1000,0},
-    {7,3000,0},
-    {8,2000,0},
-    {9,0,0}
-
-};
-
- std::map<std::string,BlocksData> BlocksMap {
-    {"Air", BlocksINF[0]},
-    // {"-", 1},
-    // {"--", 2},
-    // {"---", 3},
-    {"WaterOver", BlocksINF[4]},
-    {"WaterUnder", BlocksINF[5]},
-    {"Stone", BlocksINF[6]},
-    {"Diamond", BlocksINF[7]},
-    {"Redstone", BlocksINF[8]},
-    {"Lava", BlocksINF[9]},
-    // {"----", 10},
-    // {"-----", 11}
-};
 
 int Map::PerlinCaves(const std::string& OreType)
 {
@@ -95,7 +61,7 @@ int Map::PerlinCaves(const std::string& OreType)
             {
                 Tiles[Y][x] = BlocksMap[OreType].ID;
                 
-                Tiles[Y][x].SetType(2);
+                Tiles[Y][x].SetID(2);
                 // std::cout << OreType << " " << Tiles[Y][x].GetTile() << " \n";
  
             }
@@ -125,7 +91,7 @@ int Map::PerlinHights(const std::string& OreType)
             if ((noise> porog) && (Tiles[Y][x] == 0))
             {
                 Tiles[Y][x] = BlocksMap[OreType].ID;
-                Tiles[Y][x].SetType(2);
+                Tiles[Y][x].SetBlock(BlocksMap[OreType]);
             }
         }
     }
@@ -141,8 +107,8 @@ int Map::LiquidStripe(const std::string& LiquidType,float UpperBoundary, float D
         
             if ((Tiles[Y][X] == 0) && (static_cast<float>(rand()%101)/100 <= percentage))
             {
-                Tiles[Y][X].SetID(BlocksMap[LiquidType].ID);
-                Tiles[Y][X].SetType(1);
+                Tiles[Y][X].SetBlock(BlocksMap[LiquidType]);
+
             }
         }
     }
@@ -160,7 +126,7 @@ int Map::GetSurfaceHeight(int X)
 
     for (int Y=0;Y!=MAP_HEIGHT;Y++)
     {
-        if (Tiles[Y][X] != 0)
+        if (Tiles[Y][X].GetTile() != 0)
         {
             return Y;
         }
@@ -214,8 +180,8 @@ int Map::RandomWalkSurface()
         int RandWidth = rand()%2;
         for (int Y = lastHeight; Y < lastHeight+5+RandWidth; Y++)
         {
-            Tiles[Y][x] = 6;
-            Tiles[Y][x].SetType(2);
+            Tiles[Y][x].SetBlock(BlocksMap["Stone"]);
+            std::cout << Tiles[Y][x].GetTile();
 
         }
 

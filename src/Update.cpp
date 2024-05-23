@@ -16,20 +16,20 @@ void Update::UpdateLiquids()
             {
                 if (Y < MapHeight-1 && tilemap.Tiles[Y+1][X] == 0)
                 {
-                    std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X]);
+                    SwapTiles(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X]);
                 }
                 switch (rand()%2) 
                 {
                 case 0:
                     if (X > 0 && tilemap.Tiles[Y][X-1] == 0)
                     {
-                        std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y][X-1]);
+                        SwapTiles(tilemap.Tiles[Y][X], tilemap.Tiles[Y][X-1]);
                     }
                     break;
                 case 1:            
                     if (X < MapLength && tilemap.Tiles[Y][X+1] == 0)
                     {
-                        std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y][X+1]);
+                        SwapTiles(tilemap.Tiles[Y][X], tilemap.Tiles[Y][X+1]);
                     }
                     break;
                 default:
@@ -171,22 +171,22 @@ void Update::UpdateFallingTile()
         {
             if (tilemap.Tiles[Y][X].GetType() == 1)
             {
-                if (Y < MapHeight-1 && tilemap.Tiles[Y+1][X] == 0)
+                if (Y < (MapHeight-1) && tilemap.Tiles[Y+1][X] == 0)
                 {
-                    std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X]);
+                    SwapTiles(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X]);
                 }
                 switch (rand()%2) 
                 {
                 case 0:
                     if (X > 0 && tilemap.Tiles[Y+1][X-1] == 0)
                     {
-                        std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X-1]);
+                        SwapTiles(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X-1]);
                     }
                     break;
                 case 1:            
                     if (X < MapLength && tilemap.Tiles[Y+1][X+1] == 0)
                     {
-                        std::swap(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X+1]);
+                        SwapTiles(tilemap.Tiles[Y][X], tilemap.Tiles[Y+1][X+1]);
                     }
                     break;
 
