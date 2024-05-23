@@ -61,7 +61,7 @@ int Map::PerlinCaves(const std::string& OreType)
             {
                 Tiles[Y][x] = BlocksMap[OreType].ID;
                 
-                Tiles[Y][x].SetID(2);
+                Tiles[Y][x].SetBlock(BlocksMap[OreType]);
                 // std::cout << OreType << " " << Tiles[Y][x].GetTile() << " \n";
  
             }
@@ -88,9 +88,8 @@ int Map::PerlinHights(const std::string& OreType)
         {
             // std::cout << perlinNoise(x, Y) << " ";
             float noise = interpolatedNoise((x+PERLINKEY_X)/Interpolation,(Y+PERLINKEY_Y)/Interpolation);
-            if ((noise> porog) && (Tiles[Y][x] == 0))
+            if ((noise> porog) && (Tiles[Y][x].GetTile() == 0))
             {
-                Tiles[Y][x] = BlocksMap[OreType].ID;
                 Tiles[Y][x].SetBlock(BlocksMap[OreType]);
             }
         }
@@ -114,7 +113,20 @@ int Map::LiquidStripe(const std::string& LiquidType,float UpperBoundary, float D
     }
     return 1;
 }
-
+int Map::Walls()
+{
+    for (int X =0; X!= MAP_LENGTH; X++)
+    {
+        Tiles[MAP_HEIGHT-1][X].SetBlock(BlocksMap["Barrier"]);
+        Tiles[0][X].SetBlock(BlocksMap["Barrier"]);
+    }
+    for (int Y = 0; Y != MAP_HEIGHT; Y++)
+    {
+        Tiles[Y][MAP_LENGTH-1].SetBlock(BlocksMap["Barrier"]);
+        Tiles[Y][0].SetBlock(BlocksMap["Barrier"]);
+    }
+    return 1;
+}
 int Map::GetSurfaceHeight(int X)
 {
     if (X >= MAP_LENGTH){
@@ -126,7 +138,7 @@ int Map::GetSurfaceHeight(int X)
 
     for (int Y=0;Y!=MAP_HEIGHT;Y++)
     {
-        if (Tiles[Y][X].GetTile() != 0)
+        if (Tiles[Y][X].GetTile() != 0 && (Tiles[Y][X].GetTile() != 10))
         {
             return Y;
         }
@@ -181,7 +193,9 @@ int Map::RandomWalkSurface()
         for (int Y = lastHeight; Y < lastHeight+5+RandWidth; Y++)
         {
             Tiles[Y][x].SetBlock(BlocksMap["Stone"]);
-            std::cout << Tiles[Y][x].GetTile();
+            // std::cout << Tiles[Y][x].GetTile() << " and ";  
+            // std::cout << Tiles[Y][x+1].GetTile() << " . "; 
+            
 
         }
 
@@ -211,4 +225,15 @@ int Map::GetGeneratedHeight(int X)
         }
     }
     return MAP_HEIGHT-1;
+}
+
+int Map::Sides()
+{
+    for (int X =0; X != MAP_LENGTH; X++)
+    {
+        for (int Y =0; Y != MAP_HEIGHT; Y++)
+        {
+            
+        }
+    }
 }

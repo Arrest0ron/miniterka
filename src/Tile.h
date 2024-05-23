@@ -12,7 +12,7 @@ class Tile
 
 private: 
 
-    BlocksData& Data;
+    BlocksData Data;
 
 public:
 
@@ -28,28 +28,27 @@ public:
     void operator=(int n)
     {
         this->Data= BlocksINF[n];
-        std::cout<< this->Data.ID;
+        // std::cout<< this->Data.ID;
     }
     void operator=(BlocksData& data)
     {
         this->Data = data;
-        std::cout<< this->Data.ID;
+        // std::cout<< this->Data.ID;
     }
     Tile(Tile* other) : Data(other->Data)
     {
         this->Data = other->Data;
-        std::cout << "other ";
+        // std::cout << "other ";
     }
 
     void SetID(int n)
     {
         this->Data= BlocksINF[n];
-        std::cout<< this->Data.ID;
+        // std::cout<< this->Data.ID;
     }
     void SetBlock(BlocksData& data)
     {
-        this->Data = BlocksINF[0];
-        std::cout<< this->Data.ID;
+        this->Data = data;
     }
 
     int GetTile(){
@@ -84,8 +83,8 @@ public:
     }
     friend void SwapTiles(Tile& one, Tile& two)
     {
-        std::cout<< one.Data.ID;
-        BlocksData& inter = one.Data;
+        // std::cout<< one.Data.ID;
+        BlocksData inter = one.Data;
         one.Data = two.Data;
         two.Data = inter;
     }

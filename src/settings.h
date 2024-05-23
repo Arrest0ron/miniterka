@@ -1,11 +1,11 @@
 #pragma once
 
 
-int const TILESET_SIZE = 32*32;
+int const TILESET_SIZE = 32;
 int TILESET_X = 32;
 int tileSize = 16; // Размер каждого тайла
-const int MAP_HEIGHT = 210;
-const int MAP_LENGTH = 900;
+const int MAP_HEIGHT = 800;
+const int MAP_LENGTH = 300;
 
 const int SEALEVEL = MAP_HEIGHT / 2;
 const float MOVEMENTCAP = 2.0f;

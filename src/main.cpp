@@ -110,12 +110,13 @@ int main()
     try
     {
         
-        // tilemap.RandomWalkSurface();
-        tilemap.PerlinHights("Air");
-        // tilemap.PerlinCaves("Diamond");
-        // tilemap.PerlinCaves("Redstone");
-        // tilemap.LiquidStripe("WaterUnder",2.9f,2.f,0.5);
-        // tilemap.LiquidStripe("Lava",1.2f,1.3f,0.3);
+        tilemap.RandomWalkSurface();
+        tilemap.PerlinHights("Stone");
+        tilemap.PerlinCaves("Diamond");
+        tilemap.PerlinCaves("Redstone");
+        tilemap.LiquidStripe("WaterUnder",2.9f,2.f,0.5);
+        tilemap.LiquidStripe("Lava",1.2f,1.3f,0.3);
+        tilemap.Walls();
         
     }
 
@@ -134,13 +135,13 @@ int main()
 
     if (PLAYABLE)
     {
-        float userY = tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight()*2;
-        userY = 50;
-        User.setPosition(sf::Vector2f(MAP_LENGTH/2*tileSize,  userY));
+        float userY = tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight();
+        float userX = MAP_LENGTH/2*tileSize;
+        User.setPosition(sf::Vector2f(userX,  userY));
         // User.setTexture(tileset);
 
         NewZoom.setCenter(User.GetSprite().getPosition());
-        NewZoom.setSize(60*tileSize,60*tileSize);
+        NewZoom.setSize(User.GetModelLength()*60*tileSize,60*User.GetModelHeight()*tileSize);
         MainWindow.setView(NewZoom);
     }
    
@@ -173,11 +174,11 @@ int main()
         // Нажатия клавиш
 
         //Гравитация 
-        // if (User.GetCollision()[1] == 0)
-        // {
-        //     User.movement.y+= BaseSpeed/1.67;
-        //     User.movement.y = std::min(User.movement.y,MOVEMENTCAP*2);
-        // }
+        if (User.GetCollision()[1] == 0)
+        {
+            User.movement.y+= BaseSpeed/1.67;
+            User.movement.y = std::min(User.movement.y,MOVEMENTCAP*2);
+        }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::X) && NewZoom.getSize().x < MAP_LENGTH*tileSize*2)
         {
@@ -293,20 +294,21 @@ int main()
             verticesTouched[2].color = sf::Color::Green;
             verticesTouched[3].color = sf::Color::Magenta;
             verticesTouched[4].color = sf::Color::Red;
-            if (( TouchedX <0) || (TouchedX>MAP_LENGTH))
+            if (( TouchedX <1) || (TouchedX>=(MAP_LENGTH-1)))
             {
                 TimeFLB.restart();
 
             }
-            if (( TouchedY <0) || (TouchedY>MAP_HEIGHT))
+            else if (( TouchedY <1) || (TouchedY>=(MAP_HEIGHT-1)))
             {
                 TimeFLB.restart();
 
             }
-
-            Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
-            if ((Touched.GetTile() != 0) && (TimeFLB.getElapsedTime().asSeconds() > 0.3) && (UserCursor.DistanceFromOwner()<6 * tileSize) && (Touched.GetType()!=1) )
+            else
             {
+                Tile& Touched = tilemap.ReturnTiles()[TouchedY][TouchedX];
+                if ((Touched.GetTile() != 0) && (TimeFLB.getElapsedTime().asSeconds() > 0.3) && (UserCursor.DistanceFromOwner()<6 * tileSize) && (Touched.GetType()!=1) )
+                {
 
 
                 if (Touched.GetDurability() <= 0)
@@ -314,6 +316,9 @@ int main()
                     Touched.SetBlock(BlocksMap["Air"]);
                     TimeFLB.restart();
                 }
+            }
+
+
                 // else 
                 // {
                 //     TimeFLB.restart();
@@ -326,8 +331,6 @@ int main()
         
 
         // std::cout << User.movement.x << "  " << User.movement.y << " \n";
-        
-        
 
         NewZoom.setCenter(User.GetSprite().getPosition());
         MainWindow.setView(NewZoom);
@@ -345,23 +348,27 @@ int main()
         sf::Vector2f ViewSize = NewZoom.getSize();
         sf::Vector2f ViewCenter = NewZoom.getCenter();
 
-        float LoadedXL = (ViewCenter.x - ViewSize.x/2)/tileSize;
+        int LoadedXL = (ViewCenter.x - ViewSize.x/2)/tileSize;
         LoadedXL < 0 ? LoadedXL = 0 : LoadedXL=LoadedXL;
 
-        float LoadedXR = (ViewCenter.x + ViewSize.x/2)/tileSize;
-        LoadedXR > MAP_LENGTH ? LoadedXR = MAP_LENGTH-1 :  LoadedXR=LoadedXR;
+        int LoadedXR = (ViewCenter.x + ViewSize.x/2)/tileSize + 1;
+        LoadedXR > MAP_LENGTH ? LoadedXR = MAP_LENGTH :  LoadedXR=LoadedXR;
 
-        float LoadedYU = (ViewCenter.y - ViewSize.y/2)/tileSize;
+        int LoadedYU = (ViewCenter.y - ViewSize.y/2)/tileSize;
         LoadedYU < 0 ? LoadedYU = 0 : LoadedYU=LoadedYU;
 
-        float LoadedYD = (ViewCenter.y + ViewSize.y/2)/tileSize;
-        LoadedYD > MAP_HEIGHT ? LoadedYD = MAP_HEIGHT-1 :  LoadedYD=LoadedYD;
+        int LoadedYD = (ViewCenter.y + ViewSize.y/2)/tileSize + 1;
+        LoadedYD > MAP_HEIGHT ? LoadedYD = MAP_HEIGHT :  LoadedYD=LoadedYD;
 
+        std::vector<int> Loaded{LoadedYU,LoadedYD,LoadedXL,LoadedXR};
         // std::cout << "LOADING TILES FROM X = " << LoadedXL << " TO X = " << LoadedXR << "\n";
         // std::cout << "LOADING TILES FROM Y = " << LoadedYU << " TO Y = " << LoadedYD << "\n";
     
         
         // Тайлы и дебаг отрисовка
+        sf::VertexArray MAP(sf::PrimitiveType::Quads) ;
+        MAP.resize(MAP_LENGTH*MAP_HEIGHT*4);
+
         for (int y = LoadedYU; y < LoadedYD; ++y)
         {  
             for (int x = LoadedXL; x < LoadedXR; ++x)
@@ -381,7 +388,7 @@ int main()
 
                 tiles[tileIndex].setPosition(x * tileSize, y * tileSize);
                 MainWindow.draw(tiles[tileIndex]);
-                if (tileIndex != 0 && DebugTilesMode)
+                if ( DebugTilesMode && tileIndex != 0)
                 {
                     sf::Vertex verticesA[4] =
                     {

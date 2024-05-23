@@ -62,7 +62,8 @@ public:
         int LiquidStripe(const std::string& LiquidType,float UpperBoundary, float DownBoundary,float percentage);
         int PerlinCaves(const std::string& OreType);
         int PerlinHights(const std::string& OreType);
-        
+        int Walls();
+        int Sides();
         ~Map(){
             for(int i=0; i!= MAP_HEIGHT;i++)
             {

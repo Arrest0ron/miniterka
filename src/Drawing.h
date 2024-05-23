@@ -1,6 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <vector> 
+
 extern int tileSize;
 template<class T>
 void DrawText(sf::RenderWindow& window,sf::Font& font,float x,float y, T Text,int size = tileSize, sf::Color Color = sf::Color::White)
@@ -72,3 +74,23 @@ sf::Color gradientRG(int maxNum, int t)
 	int B      = fromB + t * deltaB;
 	return sf::Color(R,G,B);
 }
+// void Draw(sf::RenderWindow& MainWindow, Map& tilemap, std::vector<int>& Loaded)
+// {
+//         for (int y = Loaded[0]; y < Loaded[1]; ++y)
+//         {  
+//             for (int x = Loaded[2]; x < Loaded[3]; ++x)
+//             {
+
+//                 // Получаем число внутри элемента тайлмапа, обозначающее номер нужной текстурки
+//                 int tileIndex = tilemap.ReturnTiles()[y][x].GetTile();
+
+                
+
+//                 // Отрисовка тайлов
+
+//                 tiles[tileIndex].setPosition(x * tileSize, y * tileSize);
+//                 MainWindow.draw(tiles[tileIndex]);
+
+//             }
+//         }
+// }

@@ -15,7 +15,8 @@ BlocksData BlocksINF[16]
     {6,1000,2},
     {7,3000,2},
     {8,2000,2},
-    {9,0,1}
+    {9,0,1},
+    {10,0,2}
 
 };
 
@@ -31,6 +32,6 @@ BlocksData BlocksINF[16]
     {"Diamond", BlocksINF[7]},
     {"Redstone", BlocksINF[8]},
     {"Lava", BlocksINF[9]},
-    // {"----", 10},
+    {"Barrier", BlocksINF[10]},
     // {"-----", 11}
 };

@@ -48,7 +48,7 @@ std::vector<float> GetEntityCoordinatesFloat(sf::FloatRect& Bounds)
     return EntityCoordinates;
 }
 
-std::vector<int>   GetEntityCoordinatesInt(sf::FloatRect& Bounds)
+std::vector<int> GetEntityCoordinatesInt(sf::FloatRect& Bounds)
 {
 
     std::vector<float> EntityCoordinates = GetEntityCoordinatesFloat(Bounds);
@@ -57,9 +57,11 @@ std::vector<int>   GetEntityCoordinatesInt(sf::FloatRect& Bounds)
     static_cast<int>(EntityCoordinates[0]/tileSize), static_cast<int>(EntityCoordinates[1]/tileSize),
     static_cast<int>(EntityCoordinates[2]/tileSize), static_cast<int>(EntityCoordinates[3]/tileSize)
     };
+
     return EntityCoordinatesInt;
 }
 
+// void Execu
 // void TileSetCreation(sf::Sprite* tiles, sf::Texture tileset)
 // {
 
