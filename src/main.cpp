@@ -13,6 +13,7 @@
 #include "Drawing.h"
 #include "Cursor.h"
 #include "Dynamics.h"
+#include "AnimationManager.hpp"
 #include <cmath>
 
 #include "settings.h"
@@ -199,7 +200,7 @@ int main()
         
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (User.GetCollision()[1] == 1))
         {
-            User.movement.y-=(BaseSpeed+0.05)*30;
+            User.movement.y-=(BaseSpeed+0.05)*16;
         }
 
         // Остановка при крайне маленьком движении.
@@ -223,7 +224,7 @@ int main()
 
 
         //Движение с учетом коллизии
-        for (int i =0 ; i != 8; i++)
+        for (int i =0 ; i != 16; i++)
         {
             upd.UpdatePlayer(User);
             std::vector<int> calledColl = User.GetCollision();
@@ -260,7 +261,7 @@ int main()
                 User.movement.x=-User.movement.x/3 -0.1;
             }
             
-            User.GetSprite().move(User.movement.x/8,User.movement.y/8);
+            User.GetSprite().move(User.movement.x/16,User.movement.y/16);
  
         }
         

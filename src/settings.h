@@ -20,4 +20,4 @@ int DebugTilesMode = 0;
 
 
 int FREEZE = 1; // Мир не заморожен с самого начала.
-int EntitiesMAX = 0;
+int EntitiesMAX = 1;
