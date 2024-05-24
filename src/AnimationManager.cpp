@@ -44,6 +44,7 @@ void AnimationManager::update(string animation, Sprite &sprite) {
 
     // Now we update the texture on our sprite reference
     sprite.setTexture(m_textures[animation]);
+
     sprite.setTextureRect(rect);
 
   } else {

@@ -45,6 +45,7 @@ void Update::UpdateEntities()
     for (int i = 0; i!=EntitiesMAX;i++)
     {
         Collision(Entities[i]);
+        // Direction(Entities[i]);
 
     }
 }
@@ -67,7 +68,7 @@ void Update::Direction(Entity& ent)
     {
         // std::cout << ">";
     }
-    ent.GetSprite( ).setTextureRect(sf::IntRect(static_cast<int>(ent.facing)*16,0,16,16));
+    ent.GetSprite().setTextureRect(sf::IntRect(static_cast<int>(ent.facing)*16,0,16,16));
 }
 
 void Update::Collision(Entity& ent)

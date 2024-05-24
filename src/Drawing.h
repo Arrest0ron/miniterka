@@ -10,10 +10,11 @@ void DrawText(sf::RenderWindow& window,sf::Font& font,float x,float y, T Text,in
 {
 	sf::Text DrawableText;
 	DrawableText.setFont(font);
-	DrawableText.setCharacterSize(tileSize);
+	DrawableText.setCharacterSize(size);
 	DrawableText.setPosition(x, y);
 	DrawableText.setString(std::to_string(Text));
 	DrawableText.setFillColor(Color);
+
 	window.draw(DrawableText);
 }
 void DrawText(sf::RenderWindow& window,sf::Font& font,float x,float y, std::string Text,int size = tileSize, sf::Color Color = sf::Color::White)

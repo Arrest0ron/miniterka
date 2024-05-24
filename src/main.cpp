@@ -86,20 +86,20 @@ int main()
     animationSpritesheet.loadFromFile("/home/user/Documents/GitHub/miniterka/images/Entities/CatWalk.png");
 
     // Set the number of frames in the sheet
-    sf::Vector2i frameRectangle(8, 0); // A total of 16 frames
+    sf::Vector2i frameRectangle(8,0); // A total of 16 frames
 
     // Set the size of each frame of our animation
     sf::Vector2i spriteSize(24, 17);
 
     // Create our animation manager instance
     AnimationManager am;
-    am.addAnimation("Walking", animationSpritesheet, frameRectangle, spriteSize);
-    am.setAnimationFrequency("Walking", 2000);
+    am.addAnimation("Walking", animationSpritesheet, frameRectangle, spriteSize,sf::Vector2i(0, 0),0);
+    // am.setAnimationFrequency("Walking", 30023042);
     EntityStack EntitiesList;
-    Entity Cat(animationSpritesheet,"cat",24,17);
+    Entity Cat("cat",24,17);
     // Cat.setTexture(animationSpritesheet);
     // Cat.setPosition(sf::Vector2f(32,32));
-    EntitiesList.CreateEntity(22,17,animationSpritesheet,"Cat");
+    EntitiesList.CreateEntity(24,17,"Cat");
     
 
 
@@ -150,7 +150,7 @@ int main()
     float userY = tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight();
     float userX = MAP_LENGTH/2*tileSize;
     User.setPosition(sf::Vector2f(userX,  userY));
-    EntitiesList[0].setPosition(sf::Vector2f(userX-tileSize,  userY-1));
+    EntitiesList[0].setPosition(sf::Vector2f((MAP_LENGTH/2-1)*tileSize, tilemap.GetSurfaceHeight(MAP_LENGTH/2-1)*tileSize-2*EntitiesList[0].GetModelHeight()));
 
 
 
@@ -200,16 +200,20 @@ int main()
         // Нажатия клавиш
 
         //Гравитация 
-        if (User.GetCollision()[1] == 0)
-        {
-            User.movement.y+= BaseSpeed*1.67;
-            User.movement.y = std::min(User.movement.y,MOVEMENTCAP*4);
-        }
+        Gravitation(BaseSpeed,User);
+        Gravitation(BaseSpeed,EntitiesList[0]);
+
+        FollowingLogic(BaseSpeed,EntitiesList[0],User);
+
 
         //Движение по клавишам, с учетом предела скорости
 
 
         MovementCalculation(BaseSpeed,upd,User);
+        CollisionDynamic(BaseSpeed,upd,User);
+
+        CollisionDynamic(BaseSpeed,upd,EntitiesList[0]);
+
 
         
         UserCursor.UpdatePos(MainWindow);
@@ -307,7 +311,7 @@ int main()
     
         if (FREEZE)
         {
-            upd.tick(Loaded);
+            upd.tick(Loaded,User);
             
         }
 
@@ -360,7 +364,10 @@ int main()
         DrawText(MainWindow,font,User.getGlobalBounds().left-tileSize*0.5,User.getGlobalBounds().top - tileSize*1,User.GetScore(),tileSize,sf::Color::Green);
         DrawText(MainWindow,font,NewZoom.getCenter().x-NewZoom.getSize().x/2,NewZoom.getCenter().y-NewZoom.getSize().y/2,FPS,tileSize*NewZoom.getSize().x*NewZoom.getSize().y);
         
-        if (Frames==0){am.update("Walking",EntitiesList[0].GetSprite());}
+        if (Frames%4==0)
+        {
+            am.update("Walking",EntitiesList[0].GetSprite());
+        }
         // Отрисовка деталей
         
 

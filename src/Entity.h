@@ -9,6 +9,7 @@ class EntityStack;
 class Player;
 class Update;
 
+extern void Still(const float BaseSpeed, Entity& ent,float K );
 class Entity : public sf::Drawable
 {
 protected:
@@ -19,6 +20,7 @@ protected:
     std::string name;
     std::vector<int> collision;
     bool facing;
+    
     sf::Sprite m_sprite;
     
 
@@ -34,10 +36,14 @@ protected:
     
 
 public:
+    sf::Clock LogicClock;
+    void (*MOVE) (const float BaseSpeed,Entity& ent,float K);
 
     Entity(std::string Name= "",int modelLength = tileSize, int modelHeight = tileSize) : Health(100), ModelLength(modelLength), ModelHeight(modelHeight), movement(0,0), name(Name) 
     {
         NullCollision();
+        LogicClock.restart();
+        MOVE = Still;
         std::cout << "Zero ent creation of " << Name << " .\n";
 
     }
@@ -45,10 +51,12 @@ public:
     Entity(sf::Texture& texture, std::string Name= "",int modelLength = tileSize, int modelHeight = tileSize) : Health(100), ModelLength(modelLength), ModelHeight(modelHeight), movement(0,0), name(Name) 
     {
         NullCollision();
+        LogicClock.restart();
+        MOVE = Still;
         std::cout << "Entity created with texture and name " << Name << " .\n";
 
         this->setTexture(texture);
-        this->GetSprite().setTextureRect(sf::IntRect(0,0,ModelLength,ModelHeight));
+        this->GetSprite().setTextureRect(sf::IntRect(0,0,24,17));
     }
 
     ~Entity(){}
@@ -155,12 +163,20 @@ public:
     }
     void CreateEntity(int ModelWidth, int ModelHeight, sf::Texture& EntityTexture, std::string name = std::to_string(amount))
     {
-        Entity* NewEntity = new Entity(EntityTexture,name,ModelWidth,ModelHeight);
+        Entity* NewEntity = new Entity(EntityTexture,name,24,17);
+        // NewEntity->m_sprite.setTextureRect(sf::IntRect(0,0,24,17));
 
         entityStack[amount] = *NewEntity;
         amount++;
     }  
+    void CreateEntity(int ModelWidth, int ModelHeight, std::string name = std::to_string(amount))
+    {
+        Entity* NewEntity = new Entity(name,24,17);
+        // NewEntity->m_sprite.setTextureRect(sf::IntRect(0,0,24,17));
 
+        entityStack[amount] = *NewEntity;
+        amount++;
+    }  
     void operator=(EntityStack& Stack)
     {
         this->entityStack = Stack.entityStack;
