@@ -1,10 +1,4 @@
-
-#pragma once
-
 #include "AnimationManager.hpp"
-
-
-using namespace std;
 using namespace sf;
 // Map definitions
 map<string, Texture> AnimationManager::m_textures;

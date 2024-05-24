@@ -16,12 +16,7 @@ private:
 
 public:
 
-    Tile () :  Data(BlocksINF[0]) 
-    {
-        // std::cout << "null ";
-
-        
-    }
+    Tile () :  Data(BlocksINF[0]) {}
     Tile(BlocksData& data):     Data(data)    {std::cout << "data ";}
 
 

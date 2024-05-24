@@ -28,18 +28,10 @@
 //     }
 //     return 0;
 // }
-bool IsGreaterThenLimitX(sf::Vector2f& movement)
-{
-    if (pow(movement.x,2) >= MOVEMENTCAP)
-    {
-        return 1;
-    }
-    return 0;
-}
+
 int main()
 {
-    Entity* Entities = new Entity[EntitiesMAX];
-    EntityStack EntitiesList(EntitiesMAX,Entities);
+
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
     int GLOBAL_SEED = time(0);
     // int GLOBAL_SEED = 1710959590;
@@ -86,9 +78,39 @@ int main()
     sf::Texture PlayerTexture;
     PlayerTexture.loadFromFile(player);
 
-    Player User(tileset);
+    Player User;
     User.setTexture(PlayerTexture);
     User.GetSprite().setTextureRect(sf::IntRect(0,0,User.GetModelLength(),User.GetModelHeight()));
+    
+    sf::Texture animationSpritesheet;
+    animationSpritesheet.loadFromFile("/home/user/Documents/GitHub/miniterka/images/Entities/CatWalk.png");
+
+    // Set the number of frames in the sheet
+    sf::Vector2i frameRectangle(8, 0); // A total of 16 frames
+
+    // Set the size of each frame of our animation
+    sf::Vector2i spriteSize(24, 17);
+
+    // Create our animation manager instance
+    AnimationManager am;
+    am.addAnimation("Walking", animationSpritesheet, frameRectangle, spriteSize);
+    am.setAnimationFrequency("Walking", 2000);
+    EntityStack EntitiesList;
+    Entity Cat(animationSpritesheet,"cat",24,17);
+    // Cat.setTexture(animationSpritesheet);
+    // Cat.setPosition(sf::Vector2f(32,32));
+    EntitiesList.CreateEntity(22,17,animationSpritesheet,"Cat");
+    
+
+
+   
+
+
+
+
+
+
+
     
 
     // Карта, обработчик и курсор пользователя
@@ -128,6 +150,7 @@ int main()
     float userY = tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight();
     float userX = MAP_LENGTH/2*tileSize;
     User.setPosition(sf::Vector2f(userX,  userY));
+    EntitiesList[0].setPosition(sf::Vector2f(userX-tileSize,  userY-1));
 
 
 
@@ -161,7 +184,7 @@ int main()
     // Основной цикл окна
     while (MainWindow.isOpen())
     {
-
+        
         // Получаем время прошлого цикла
         sf::Time dt = clock.restart();
         float dtAsSeconds = dt.asSeconds();
@@ -186,84 +209,8 @@ int main()
         //Движение по клавишам, с учетом предела скорости
 
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && ( (!IsGreaterThenLimitX(User.movement)) || User.movement.x > 0 ))
-        {
-            User.movement.x -= BaseSpeed/3 + BaseSpeed/3*2*(abs(User.movement.x)/MOVEMENTCAP);
+        MovementCalculation(BaseSpeed,upd,User);
 
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)&& ( (!IsGreaterThenLimitX(User.movement)) || User.movement.x < 0 ))
-        {
-            User.movement.x += BaseSpeed/3 + BaseSpeed/3*2*(abs(User.movement.x)/MOVEMENTCAP);
-
-        }
-
-        
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (User.GetCollision()[1] == 1))
-        {
-            User.movement.y-=(BaseSpeed+0.05)*16;
-        }
-
-        // Остановка при крайне маленьком движении.
-        if ((!sf::Keyboard::isKeyPressed(sf::Keyboard::D))&&(!sf::Keyboard::isKeyPressed(sf::Keyboard::A))) 
-        {
-
-            User.movement.x /= (1+BaseSpeed*0.2);
-            if ((-0.01 < User.movement.x) && (User.movement.x< 0.01 ))
-            {
-                User.movement.x = 0;
-            }
-        }
-        if ((!sf::Keyboard::isKeyPressed(sf::Keyboard::W))&&(!sf::Keyboard::isKeyPressed(sf::Keyboard::S))) 
-        {
-            User.movement.y /= (1+BaseSpeed*0.2);
-            if ((-0.01 < User.movement.y) && (User.movement.y< 0.01 ))
-            {
-                User.movement.y = 0;
-            }
-        }
-
-
-        //Движение с учетом коллизии
-        for (int i =0 ; i != 16; i++)
-        {
-            upd.UpdatePlayer(User);
-            std::vector<int> calledColl = User.GetCollision();
-            if ((calledColl[0] == 1) && (User.movement.y<0))
-            {
-                User.movement.y=-0;
-            }
-            if ((calledColl[1] == 1) && (User.movement.y>0))
-            {
-                User.movement.y=0;
-            }
-            if ((calledColl[2] == 1) && (User.movement.x<0))
-            {
-                User.movement.x=0;
-            }
-            if ((calledColl[3] == 1) && (User.movement.x>0))
-            {
-                User.movement.x=-0;
-            }
-            if ((calledColl[0] == 2))
-            {
-                User.movement.y=-User.movement.y/3 -0.1;
-            }
-            if ((calledColl[1] == 2) )
-            {
-                User.movement.y=-User.movement.y/3 + 0.1;
-            }
-            if ((calledColl[2] == 2) )
-            {
-                User.movement.x=-User.movement.x/3 + 0.1;
-            }
-            if ((calledColl[3] == 2) )
-            {
-                User.movement.x=-User.movement.x/3 -0.1;
-            }
-            
-            User.GetSprite().move(User.movement.x/16,User.movement.y/16);
- 
-        }
         
         UserCursor.UpdatePos(MainWindow);
 
@@ -369,8 +316,6 @@ int main()
         Tile** TileArray = tilemap.ReturnTiles();
         
 
-
-
         MAP.resize((LoadedYU - LoadedYD)*(LoadedXL-LoadedXR)*4);
         for (int y = LoadedYU; y < LoadedYD; ++y)
         {  
@@ -415,7 +360,7 @@ int main()
         DrawText(MainWindow,font,User.getGlobalBounds().left-tileSize*0.5,User.getGlobalBounds().top - tileSize*1,User.GetScore(),tileSize,sf::Color::Green);
         DrawText(MainWindow,font,NewZoom.getCenter().x-NewZoom.getSize().x/2,NewZoom.getCenter().y-NewZoom.getSize().y/2,FPS,tileSize*NewZoom.getSize().x*NewZoom.getSize().y);
         
-        if (!(rand()%100)){}
+        if (Frames==0){am.update("Walking",EntitiesList[0].GetSprite());}
         // Отрисовка деталей
         
 
@@ -462,6 +407,7 @@ int main()
 
         MainWindow.draw(User); 
         MainWindow.draw(verticesTouched,5,sf::LineStrip); // Оверлей выбранного тайла
+        MainWindow.draw(EntitiesList[0]);
         // DrawContainingBox(MainWindow,User);
         // DrawContainingBoxInt(MainWindow,User);
         MainWindow.display();

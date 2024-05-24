@@ -16,6 +16,7 @@ protected:
     int Health;
     int ModelHeight;
     int ModelLength;
+    std::string name;
     std::vector<int> collision;
     bool facing;
     sf::Sprite m_sprite;
@@ -24,6 +25,7 @@ protected:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         target.draw(m_sprite, states);
+        // std::cout << name << " drawed. \n";
     }
 
     
@@ -33,23 +35,22 @@ protected:
 
 public:
 
-    Entity() : Health(100), ModelLength(tileSize), ModelHeight(tileSize), movement(0,0) 
+    Entity(std::string Name= "",int modelLength = tileSize, int modelHeight = tileSize) : Health(100), ModelLength(modelLength), ModelHeight(modelHeight), movement(0,0), name(Name) 
     {
         NullCollision();
-        std::cout << "entity created. \n";
+        std::cout << "Zero ent creation of " << Name << " .\n";
+
     }
 
-    Entity(sf::Texture texture) : Health(100), ModelLength(tileSize), ModelHeight(tileSize), movement(0,0)
+    Entity(sf::Texture& texture, std::string Name= "",int modelLength = tileSize, int modelHeight = tileSize) : Health(100), ModelLength(modelLength), ModelHeight(modelHeight), movement(0,0), name(Name) 
     {
         NullCollision();
-        // this->setTexture(texture);
-        std::cout << " We are here.";
+        std::cout << "Entity created with texture and name " << Name << " .\n";
 
-        sf::Texture EntityTexture;
-
-        m_sprite.setTextureRect(sf::IntRect(0,0,ModelLength,ModelHeight));
+        this->setTexture(texture);
+        this->GetSprite().setTextureRect(sf::IntRect(0,0,ModelLength,ModelHeight));
     }
-    
+
     ~Entity(){}
 
     sf::Vector2f movement;
@@ -78,12 +79,22 @@ public:
     {
         return ModelLength;
     }
+
+    void SetModelLength(int n)
+    {
+        ModelLength = n;
+    }
     
     int GetModelHeight()
     {
         return ModelHeight;
     }
-    
+        
+    void SetModelHeight(int n)
+    {
+        ModelHeight = n;
+    }
+
     sf::FloatRect getGlobalBounds()
     {
         return m_sprite.getGlobalBounds();
@@ -117,10 +128,7 @@ class Player : public Entity
 private:
     unsigned score;
 public:
-    Player(sf::Texture& text)
-    {
-        std::cout << "Player created.\n";
-    }
+    Player() : Entity(){}
     int GetScore() const {return this->score;}
     void SetScore(const int n) {this->score = n;}
     void IncreaseScore(const int n) {this->score += n;}
@@ -129,9 +137,14 @@ public:
 class EntityStack
 {
     Entity* entityStack;
-    int MaxEntityAmount;
+    inline static int MaxEntityAmount = 1;
+    inline static int amount = 0;
 public:
-    EntityStack(int amount, Entity*& stack) : MaxEntityAmount(amount), entityStack(stack){};
+
+    EntityStack() 
+    {
+        entityStack = new Entity [MaxEntityAmount];
+    }
     ~EntityStack()
     {
         if (entityStack != nullptr)
@@ -140,7 +153,14 @@ public:
         }
         
     }
-    
+    void CreateEntity(int ModelWidth, int ModelHeight, sf::Texture& EntityTexture, std::string name = std::to_string(amount))
+    {
+        Entity* NewEntity = new Entity(EntityTexture,name,ModelWidth,ModelHeight);
+
+        entityStack[amount] = *NewEntity;
+        amount++;
+    }  
+
     void operator=(EntityStack& Stack)
     {
         this->entityStack = Stack.entityStack;
