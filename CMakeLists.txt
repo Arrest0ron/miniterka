@@ -21,6 +21,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/textures-4.png
         ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/players/char_01.png
         ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)  
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/Entities/CatWalk.png
+        ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)  
 target_link_libraries(CMakeSFMLProject PRIVATE sfml-graphics)
 target_compile_features(CMakeSFMLProject PRIVATE cxx_std_17)
 

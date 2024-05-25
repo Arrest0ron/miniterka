@@ -43,6 +43,10 @@ int main()
     // Создание окна
     sf::RenderWindow MainWindow(sf::VideoMode(900, 900), "Tilemap");
     MainWindow.setFramerateLimit(60);
+        
+    sf::Texture animationSpritesheet;
+    
+    
 
     // Выбор расположения файлов для разных ос
     #ifdef WIN32
@@ -50,11 +54,13 @@ int main()
         std::string player = "char_01.png";
         std::string texture_4 = "textures-4.png";
         std::string arial = "Arial.ttf";
+        animationSpritesheet.loadFromFile("CatWalk.png");
     #else
         setlocale(LC_ALL, "Russian");
         std::string player = "/home/user/Documents/GitHub/miniterka/images/players/char_01.png";
         std::string texture_4 = "/home/user/Documents/GitHub/miniterka/images/textures-4.png";
         std::string arial = "/home/user/Documents/GitHub/miniterka/images/Arial.ttf";
+        animationSpritesheet.loadFromFile("/home/user/Documents/GitHub/miniterka/images/Entities/CatWalk.png");
     #endif
 
     //Загружаем текстуры
@@ -81,9 +87,7 @@ int main()
     Player User;
     User.setTexture(PlayerTexture);
     User.GetSprite().setTextureRect(sf::IntRect(0,0,User.GetModelLength(),User.GetModelHeight()));
-    
-    sf::Texture animationSpritesheet;
-    animationSpritesheet.loadFromFile("/home/user/Documents/GitHub/miniterka/images/Entities/CatWalk.png");
+
 
     // Set the number of frames in the sheet
     sf::Vector2i frameRectangle(8,0); // A total of 16 frames
@@ -362,7 +366,7 @@ int main()
         DrawText(MainWindow,font,MAP_LENGTH/2,0,GLOBAL_SEED,24,sf::Color::Black);
         DrawText(MainWindow,font,User.getGlobalBounds().left-tileSize*0.5,User.getGlobalBounds().top - tileSize*2,User.GetHealth(),tileSize,gradientRG(100,User.GetHealth()));
         DrawText(MainWindow,font,User.getGlobalBounds().left-tileSize*0.5,User.getGlobalBounds().top - tileSize*1,User.GetScore(),tileSize,sf::Color::Green);
-        DrawText(MainWindow,font,NewZoom.getCenter().x-NewZoom.getSize().x/2,NewZoom.getCenter().y-NewZoom.getSize().y/2,FPS,tileSize*NewZoom.getSize().x*NewZoom.getSize().y);
+        DrawText(MainWindow,font,NewZoom.getCenter().x-NewZoom.getSize().x/2,NewZoom.getCenter().y-NewZoom.getSize().y/2,FPS,std::min(tileSize*NewZoom.getSize().x*NewZoom.getSize().y , static_cast<float>(tileSize*2)) );
         
         if (Frames%4==0)
         {

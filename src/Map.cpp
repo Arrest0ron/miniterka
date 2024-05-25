@@ -229,11 +229,7 @@ int Map::GetGeneratedHeight(int X)
 
 int Map::Sides()
 {
-    for (int X =0; X != MAP_LENGTH; X++)
-    {
-        for (int Y =0; Y != MAP_HEIGHT; Y++)
-        {
-            
-        }
-    }
+
+    return 1;
+
 }
