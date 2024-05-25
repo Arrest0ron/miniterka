@@ -13,6 +13,7 @@
 #include "Drawing.h"
 #include "Cursor.h"
 #include "Dynamics.h"
+#include "Menu.h"
 #include "AnimationManager.hpp"
 #include <cmath>
 
@@ -31,7 +32,7 @@
 
 int main()
 {
-
+    menu();
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
     int GLOBAL_SEED = time(0);
     // int GLOBAL_SEED = 1710959590;
