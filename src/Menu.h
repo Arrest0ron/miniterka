@@ -78,8 +78,8 @@ int menu()
     
     sf::Event event;
 
-    sf::RenderWindow newWindow(sf::VideoMode(900, 900), "Character Selection");
-    newWindow.setVisible(false);
+    // sf::RenderWindow newWindow(sf::VideoMode(900, 900), "Character Selection");
+    // newWindow.setVisible(false);
     // Загрузка изображения фона для второго окна
     // sf::Texture backgroundTexture2;
     //sf::Texture backgroundTexture2;
@@ -105,34 +105,47 @@ int menu()
     while (window.isOpen())
     {
         // Обработка событий
-        while (window.pollEvent(event))
+        if (!window2)
         {
-            if (event.type == sf::Event::Closed)
+            while (window.pollEvent(event))
             {
-                window.close();
-                newWindow.close();
-            }   
-            else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
-            {
-
-                //  была ли нажата кнопка
-                if (buttonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
+                if (event.type == sf::Event::Closed)
                 {
-                    // Открытие нового окна
-                    std::cout << " here";
+                    window.close();
                     
-                    newWindow.setVisible(true);
-                    window2 = true;
+                }   
+                else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+                {
 
+                    //  была ли нажата кнопка
+                    if (buttonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
+                    {
+                        // Открытие нового окна
+                        std::cout << " here";
+                        
+                        // newWindow.setVisible(true);
+                        window2 = true;
+
+
+                    }
 
                 }
 
             }
+            window.clear();
 
+            // Отрисовка спрайта и кнопки в главном окне
+
+            
+            window.draw(backgroundSprite);
+            window.draw(buttonSprite);
+            window.display();
+            //window.close();
         }
-        while (window2 && newWindow.isOpen())
+            
+        if (window2)
         {
-            while (newWindow.pollEvent(event))
+            while (window.pollEvent(event))
             {
                 // if (event.type == sf::Event::Closed)
                 // {
@@ -141,7 +154,7 @@ int menu()
                 // }
                 if (event.type == sf::Event::Closed)
                 {
-                    newWindow.setVisible(false);
+
                     window2 = false;
                     window.close(); // Закрываем первое окно
                 }
@@ -197,33 +210,24 @@ int menu()
                     }
                 }
             }
-            newWindow.clear();
-            newWindow.draw(backgroundSprite2);
-            newWindow.draw(button1Sprite);
+            window.clear();
+            window.draw(backgroundSprite2);
+            window.draw(button1Sprite);
 
-            newWindow.draw(button2Sprite);
+            window.draw(button2Sprite);
 
-            newWindow.draw(selectButtonSprite);
+            window.draw(selectButtonSprite);
             sf::IntRect charRect(0, 0, 16, 16); // Начальные координаты (0, 0), ширина 16, высота 16
     // Создание спрайта с выбранной областью
             sf::Sprite characterSprite(characterTexture, charRect);
             //sf::Sprite characterSprite(characterTexture);
             characterSprite.setPosition(420, 500);
             characterSprite.setScale(5.0f, 5.0f);
-            newWindow.draw(characterSprite);
+            window.draw(characterSprite);
             // newWindow.draw(characterSprite);
-            newWindow.display();
+            window.display();
         }
-        
-        window.clear();
-
-        // Отрисовка спрайта и кнопки в главном окне
-
-        
-        window.draw(backgroundSprite);
-        window.draw(buttonSprite);
-        window.display();
-        //window.close();
+    
 
     
     }
