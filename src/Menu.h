@@ -206,6 +206,11 @@ int menu()
                             selectedCharacterFile = prefix+playerPrefix+"char_02.png";
                             num = 2;
                         }
+                        else if (selectButtonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
+                        {
+                            window.close();
+                        }
+
 
                     }
                 }
