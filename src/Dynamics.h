@@ -68,6 +68,7 @@ void MovementCalculation(const float BaseSpeed,Update& upd,Entity& ent)
 		}
 	}
 }
+
 void CollisionDynamic(const float BaseSpeed,Update& upd,Entity& ent)
 {
 		//Движение с учетом коллизии
@@ -122,8 +123,6 @@ void Gravitation(const float BaseSpeed,Entity& ent)
 		ent.movement.y = std::min(ent.movement.y,MOVEMENTCAP*4);
 	}
 }
-
-
 
 void MoveRight(const float BaseSpeed,Entity& ent, float K = 1)
 {

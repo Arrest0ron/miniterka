@@ -39,7 +39,7 @@ public:
     sf::Clock LogicClock;
     void (*MOVE) (const float BaseSpeed,Entity& ent,float K);
 
-    Entity(std::string Name= "",int modelLength = tileSize, int modelHeight = tileSize) : Health(100), ModelLength(modelLength), ModelHeight(modelHeight), movement(0,0), name(Name) 
+    Entity(std::string Name= "",int modelLength = tileSize, int modelHeight = tileSize) : Health(100), ModelLength(modelLength), ModelHeight(modelHeight), movement(0,0), name(Name), facing(0) 
     {
         NullCollision();
         LogicClock.restart();

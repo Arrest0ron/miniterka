@@ -83,7 +83,9 @@ int main()
     // Игрок 
 
     sf::Texture PlayerTexture;
+    PlayerTexture.setRepeated(true);
     PlayerTexture.loadFromFile(player);
+    PlayerTexture.setRepeated(true);
 
     Player User;
     User.setTexture(PlayerTexture);
@@ -131,12 +133,12 @@ int main()
     try
     {
         
-        tilemap.RandomWalkSurface();
-        tilemap.PerlinHights("Stone");
-        tilemap.PerlinCaves("Diamond");
-        tilemap.PerlinCaves("Redstone");
-        tilemap.LiquidStripe("WaterUnder",2.9f,2.f,0.5);
-        tilemap.LiquidStripe("Lava",1.2f,1.3f,0.3);
+        // tilemap.RandomWalkSurface();
+        // tilemap.PerlinHights("Stone");
+        // tilemap.PerlinCaves("Diamond");
+        // tilemap.PerlinCaves("Redstone");
+        // tilemap.LiquidStripe("WaterUnder",2.9f,2.f,0.5);
+        // tilemap.LiquidStripe("Lava",1.2f,1.3f,0.3);
         tilemap.Walls();
         
     }

@@ -60,14 +60,6 @@ void Update::Direction(Entity& ent)
     {
         ent.facing = false;
     }
-    if (ent.facing)
-    {
-        // std::cout << "<";
-    }
-    else
-    {
-        // std::cout << ">";
-    }
     ent.GetSprite().setTextureRect(sf::IntRect(static_cast<int>(ent.facing)*16,0,16,16));
 }
 
