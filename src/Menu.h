@@ -145,10 +145,10 @@ int menu()
                             return 1;
                         }
                         std::cout << "ch1 loaded.\n";
-                        sf::Sprite characterSprite(characterTexture);
-                        characterSprite.setPosition(450, 450);
-                        characterSprite.setScale(1.6f, 1.6f);
-                        newWindow.draw(characterSprite);
+                        // sf::Sprite characterSprite(characterTexture);
+                        // characterSprite.setPosition(450, 450);
+                        // characterSprite.setScale(1.6f, 1.6f);
+                        // newWindow.draw(characterSprite);
                     }
                     //newWindow.display();
                     else if (button2Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
@@ -158,10 +158,10 @@ int menu()
                             return 1;
                         }
                         std::cout << "ch2 loaded.\n";
-                        sf::Sprite characterSprite(characterTexture);
-                        characterSprite.setPosition(300, 300);
-                        characterSprite.setScale(1.6f, 1.6f);
-                        newWindow.draw(characterSprite);
+                        // sf::Sprite characterSprite(characterTexture);
+                        // characterSprite.setPosition(300, 300);
+                        // characterSprite.setScale(1.6f, 1.6f);
+                        // newWindow.draw(characterSprite);
                     }
                     else if (selectButtonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                     {
@@ -188,6 +188,10 @@ int menu()
             newWindow.draw(button2Sprite);
 
             newWindow.draw(selectButtonSprite);
+            sf::Sprite characterSprite(characterTexture);
+            characterSprite.setPosition(420, 500);
+            characterSprite.setScale(5.0f, 5.0f);
+            newWindow.draw(characterSprite);
             // newWindow.draw(characterSprite);
             newWindow.display();
         }
