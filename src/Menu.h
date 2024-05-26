@@ -10,7 +10,19 @@ int menu()
     int num = 0;
     // Загрузка изображения фона
     sf::Texture backgroundTexture;
-    if (!backgroundTexture.loadFromFile("phonk.png"))
+    std::string background1, background2,button1,button2,prefix,playerPrefix;
+    background1 = "phonk.png";
+    background2 = "phonk2.png";
+    button1 = "button.png";
+    button2 = "button1.png";
+    #ifndef WIN32
+        prefix = "/home/user/Documents/GitHub/miniterka/images/";
+        playerPrefix = "players/";
+
+
+    #endif
+
+    if (!backgroundTexture.loadFromFile(prefix+background1))
     {
         // Обработка ошибки загрузки изображения
         return 1;
@@ -21,7 +33,7 @@ int menu()
 
     // Загрузка изображения кнопки
     sf::Texture buttonTexture;
-    if (!buttonTexture.loadFromFile("button.png"))
+    if (!buttonTexture.loadFromFile(prefix+button1))
     {
         
         return 1;
@@ -41,10 +53,10 @@ int menu()
 
     sf::Texture button1Texture, button2Texture, selectButtonTexture;
     
-    if (!button1Texture.loadFromFile("button.png") || !button2Texture.loadFromFile("button.png") || !selectButtonTexture.loadFromFile("button1.png"))
+    if (!button1Texture.loadFromFile(prefix+button1) || !button2Texture.loadFromFile(prefix+button1) || !selectButtonTexture.loadFromFile(prefix+button2))
     {
         // Обработка ошибки загрузки изображений
-        return 1;
+        return -1;
     }
 
     // Создание объектов Sprite для кнопок в новом окне
@@ -60,8 +72,9 @@ int menu()
 
     //  был ли выбран персонаж
     bool characterSelected = false;
-    std::string selectedCharacterFile = "";
+    std::string selectedCharacterFile = prefix+playerPrefix+"char_01.png";
     sf::Texture characterTexture;
+    characterTexture.loadFromFile(prefix+playerPrefix+"char_01.png");
     
     sf::Event event;
 
@@ -71,7 +84,7 @@ int menu()
     // sf::Texture backgroundTexture2;
     //sf::Texture backgroundTexture2;
     sf::Texture backgroundTexture2;
-    if (!backgroundTexture2.loadFromFile("phonk2.png"))
+    if (!backgroundTexture2.loadFromFile(background2))
     {
         // Обработка ошибки загрузки изображения
         return 1;
@@ -141,7 +154,7 @@ int menu()
                     // была ли нажата кнопка переключения персонажа
                     if (button1Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                     {
-                        if (!characterTexture.loadFromFile("char_01.png"))
+                        if (!characterTexture.loadFromFile(prefix+playerPrefix+"char_01.png"))
                         {
                             return 1;
                         }
@@ -154,7 +167,7 @@ int menu()
                     //newWindow.display();
                     else if (button2Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                     {
-                        if (!characterTexture.loadFromFile("char_02.png"))
+                        if (!characterTexture.loadFromFile(prefix+playerPrefix+"char_02.png"))
                         {
                             return 1;
                         }
@@ -172,12 +185,12 @@ int menu()
                         // Сохранение имени файла выбранного персонажа
                         if (button1Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                         {
-                            selectedCharacterFile = "char_01.png";
+                            selectedCharacterFile = prefix+playerPrefix+"char_01.png";
                             num = 1;
                         }
                         else if (button2Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                         {
-                            selectedCharacterFile = "char_02.png";
+                            selectedCharacterFile = prefix+playerPrefix+"char_02.png";
                             num = 2;
                         }
 
@@ -191,7 +204,7 @@ int menu()
             newWindow.draw(button2Sprite);
 
             newWindow.draw(selectButtonSprite);
-            sf::IntRect charRect(0, 0, 16, 16); // Начальные координаты (0, 0), ширина 256, высота 512
+            sf::IntRect charRect(0, 0, 16, 16); // Начальные координаты (0, 0), ширина 16, высота 16
     // Создание спрайта с выбранной областью
             sf::Sprite characterSprite(characterTexture, charRect);
             //sf::Sprite characterSprite(characterTexture);

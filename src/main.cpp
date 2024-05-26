@@ -48,7 +48,7 @@ int main()
     sf::Texture animationSpritesheet;
     
     
-
+    std::string player;
     // Выбор расположения файлов для разных ос
     #ifdef WIN32
         system("chcp 65001");
@@ -64,7 +64,15 @@ int main()
         animationSpritesheet.loadFromFile("CatWalk.png");
     #else
         setlocale(LC_ALL, "Russian");
-        std::string player = "/home/user/Documents/GitHub/miniterka/images/players/char_01.png";
+        if(num == 1)
+        {
+            player = "/home/user/Documents/GitHub/miniterka/images/players/char_01.png";
+        }
+        else
+        {
+            player = "/home/user/Documents/GitHub/miniterka/images/players/char_02.png";
+        }
+        
         std::string texture_4 = "/home/user/Documents/GitHub/miniterka/images/textures-4.png";
         std::string arial = "/home/user/Documents/GitHub/miniterka/images/Arial.ttf";
         animationSpritesheet.loadFromFile("/home/user/Documents/GitHub/miniterka/images/Entities/CatWalk.png");
