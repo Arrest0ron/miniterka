@@ -52,12 +52,12 @@ int main()
     // Выбор расположения файлов для разных ос
     #ifdef WIN32
         system("chcp 65001");
-        std::string player = "char_01.png";
+        player = "char_01.png";
         if(num == 1){
-            std::string player = "char_01.png";
+            player = "char_01.png";
         }
         else{
-            std::string player = "char_02.png";
+            player = "char_02.png";
         }
         std::string texture_4 = "textures-4.png";
         std::string arial = "Arial.ttf";
