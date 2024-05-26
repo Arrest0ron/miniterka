@@ -19,14 +19,17 @@ public:
     void UpdateEntities();
     void Collision(Entity& ent);
     void Direction(Entity& ent);
+    void TouchLava(Entity& ent);
 
 
     Update(Map& tiles, EntityStack& EntityList, int entMAX, Player& user) : tilemap(tiles), Entities(EntityList), EntitiesMAX(entMAX){}
     void tick(std::vector<int>& Loaded,Player& User)
     {
         UpdatePlayer(User);
+        TouchLava(User);
         UpdateLiquids(Loaded);
         UpdateEntities();
+
     }
     void UpdatePlayer(Player& User);
     ~Update(){}     
