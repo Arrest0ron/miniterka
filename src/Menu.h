@@ -7,7 +7,7 @@
 
 int menu()
 {
-    int num = 0;
+    int num = 1;
     // Загрузка изображения фона
     sf::Texture backgroundTexture;
     std::string background1, background2,button1,button2,prefix,playerPrefix;
