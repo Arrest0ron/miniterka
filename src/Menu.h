@@ -39,6 +39,7 @@ int menu()
 
 
     sf::Texture button1Texture, button2Texture, selectButtonTexture;
+    
     if (!button1Texture.loadFromFile("button.png") || !button2Texture.loadFromFile("button.png") || !selectButtonTexture.loadFromFile("button.png"))
     {
         // Обработка ошибки загрузки изображений
@@ -46,21 +47,37 @@ int menu()
     }
 
     // Создание объектов Sprite для кнопок в новом окне
+    // sf::Texture backgroundTexture2;
+    // sf::Sprite backgroundSprite2(backgroundTexture2);
     sf::Sprite button1Sprite(button1Sprite), button2Sprite(button2Texture), selectButtonSprite(selectButtonTexture);
     button1Sprite.setPosition(200, 600);
     button2Sprite.setPosition(450, 600);
     selectButtonSprite.setPosition(700, 600);
+    button1Sprite.setScale(0.8f,0.8f);
+    button2Sprite.setScale(0.8f, 0.8f);
+    selectButtonSprite.setScale(0.8f, 0.8f);
 
     //  был ли выбран персонаж
     bool characterSelected = false;
     std::string selectedCharacterFile = "";
     sf::Texture characterTexture;
-
+    
     sf::Event event;
 
     sf::RenderWindow newWindow(sf::VideoMode(900, 900), "Character Selection");
     newWindow.setVisible(false);
+    // Загрузка изображения фона для второго окна
+    // sf::Texture backgroundTexture2;
+    sf::Texture backgroundTexture2;
+    sf::Sprite backgroundSprite2(backgroundTexture2);
+    if (!backgroundTexture2.loadFromFile("phonk2.png"))
+    {
+        // Обработка ошибки загрузки изображения
+        return 1;
+    }
 
+// Создание объекта Sprite для фона второго окна
+//sf::Sprite backgroundSprite2(backgroundTexture2);
     // Основной цикл 
     while (window.isOpen())
     {
@@ -94,12 +111,18 @@ int menu()
         {
             while (newWindow.pollEvent(event))
             {
+                // if (event.type == sf::Event::Closed)
+                // {
+                //     newWindow.setVisible(false);
+                //     window2 = false;
+                // }
                 if (event.type == sf::Event::Closed)
                 {
                     newWindow.setVisible(false);
                     window2 = false;
+                    window.close(); // Закрываем первое окно
                 }
-               
+                    
 
 
                 else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
@@ -145,9 +168,10 @@ int menu()
                 }
             }
             newWindow.clear();
-            newWindow.draw(backgroundSprite);
+            newWindow.draw(backgroundSprite2);
             newWindow.draw(button1Sprite);
             newWindow.draw(button2Sprite);
+            newWindow.draw(selectButtonSprite);
             newWindow.display();
         }
         
@@ -159,10 +183,13 @@ int menu()
         window.draw(backgroundSprite);
         window.draw(buttonSprite);
         window.display();
+        //window.close();
 
     
     }
-    
+    // newWindow.close();
+    // window.close();
+
     
         // Возвращаем статус выбора персонажа
     return characterSelected;
