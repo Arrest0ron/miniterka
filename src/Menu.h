@@ -3,10 +3,11 @@
 #include <iostream>
 
 //extern int tileSize;
-
+//extern std::string player;
 
 int menu()
 {
+    int num = 0;
     // Загрузка изображения фона
     sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("phonk.png"))
@@ -172,10 +173,12 @@ int menu()
                         if (button1Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                         {
                             selectedCharacterFile = "char_01.png";
+                            num = 1;
                         }
                         else if (button2Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                         {
                             selectedCharacterFile = "char_02.png";
+                            num = 2;
                         }
 
                     }
@@ -188,7 +191,10 @@ int menu()
             newWindow.draw(button2Sprite);
 
             newWindow.draw(selectButtonSprite);
-            sf::Sprite characterSprite(characterTexture);
+            sf::IntRect charRect(0, 0, 16, 16); // Начальные координаты (0, 0), ширина 256, высота 512
+    // Создание спрайта с выбранной областью
+            sf::Sprite characterSprite(characterTexture, charRect);
+            //sf::Sprite characterSprite(characterTexture);
             characterSprite.setPosition(420, 500);
             characterSprite.setScale(5.0f, 5.0f);
             newWindow.draw(characterSprite);
@@ -208,12 +214,8 @@ int menu()
 
     
     }
-    // newWindow.close();
-    // window.close();
-
     
-        // Возвращаем статус выбора персонажа
-    return characterSelected;
+    return num;
     
     // return 0;
 }

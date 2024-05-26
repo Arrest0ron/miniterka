@@ -32,7 +32,7 @@
 
 int main()
 {
-    menu();
+    int num = menu();
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
     int GLOBAL_SEED = time(0);
     // int GLOBAL_SEED = 1710959590;
@@ -53,6 +53,12 @@ int main()
     #ifdef WIN32
         system("chcp 65001");
         std::string player = "char_01.png";
+        if(num == 1){
+            std::string player = "char_01.png";
+        }
+        else{
+            std::string player = "char_02.png";
+        }
         std::string texture_4 = "textures-4.png";
         std::string arial = "Arial.ttf";
         animationSpritesheet.loadFromFile("CatWalk.png");
