@@ -35,6 +35,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/phonk2.png
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/button.png
         ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)  
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/button.png
+        ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)  
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/images/phonk.png
         ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)  
 

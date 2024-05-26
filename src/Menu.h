@@ -40,7 +40,7 @@ int menu()
 
     sf::Texture button1Texture, button2Texture, selectButtonTexture;
     
-    if (!button1Texture.loadFromFile("button.png") || !button2Texture.loadFromFile("button.png") || !selectButtonTexture.loadFromFile("button.png"))
+    if (!button1Texture.loadFromFile("button.png") || !button2Texture.loadFromFile("button.png") || !selectButtonTexture.loadFromFile("button1.png"))
     {
         // Обработка ошибки загрузки изображений
         return 1;
@@ -49,13 +49,13 @@ int menu()
     // Создание объектов Sprite для кнопок в новом окне
     // sf::Texture backgroundTexture2;
     // sf::Sprite backgroundSprite2(backgroundTexture2);
-    sf::Sprite button1Sprite(button1Sprite), button2Sprite(button2Texture), selectButtonSprite(selectButtonTexture);
+    sf::Sprite button1Sprite(button1Texture), button2Sprite(button2Texture), selectButtonSprite(selectButtonTexture);
     button1Sprite.setPosition(200, 600);
-    button2Sprite.setPosition(450, 600);
-    selectButtonSprite.setPosition(700, 600);
-    button1Sprite.setScale(0.8f,0.8f);
+    button2Sprite.setPosition(700, 600);
+    selectButtonSprite.setPosition(400, 600);
+    button1Sprite.setScale(-0.8f,0.8f);
     button2Sprite.setScale(0.8f, 0.8f);
-    selectButtonSprite.setScale(0.8f, 0.8f);
+    selectButtonSprite.setScale(1.3f, 1.3f);
 
     //  был ли выбран персонаж
     bool characterSelected = false;
@@ -68,13 +68,22 @@ int menu()
     newWindow.setVisible(false);
     // Загрузка изображения фона для второго окна
     // sf::Texture backgroundTexture2;
+    //sf::Texture backgroundTexture2;
     sf::Texture backgroundTexture2;
-    sf::Sprite backgroundSprite2(backgroundTexture2);
     if (!backgroundTexture2.loadFromFile("phonk2.png"))
     {
         // Обработка ошибки загрузки изображения
         return 1;
     }
+
+    // Создание объекта Sprite для фона второго окна
+    sf::Sprite backgroundSprite2(backgroundTexture2);
+    // sf::Sprite backgroundSprite2(backgroundTexture2);
+    // if (!backgroundTexture2.loadFromFile("phonk2.png"))
+    // {
+    //     // Обработка ошибки загрузки изображения
+    //     return 1;
+    // }
 
 // Создание объекта Sprite для фона второго окна
 //sf::Sprite backgroundSprite2(backgroundTexture2);
@@ -137,8 +146,11 @@ int menu()
                         }
                         std::cout << "ch1 loaded.\n";
                         sf::Sprite characterSprite(characterTexture);
-                        characterSprite.setPosition(300, 300);
+                        characterSprite.setPosition(450, 450);
+                        characterSprite.setScale(1.6f, 1.6f);
+                        newWindow.draw(characterSprite);
                     }
+                    //newWindow.display();
                     else if (button2Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                     {
                         if (!characterTexture.loadFromFile("char_02.png"))
@@ -148,6 +160,8 @@ int menu()
                         std::cout << "ch2 loaded.\n";
                         sf::Sprite characterSprite(characterTexture);
                         characterSprite.setPosition(300, 300);
+                        characterSprite.setScale(1.6f, 1.6f);
+                        newWindow.draw(characterSprite);
                     }
                     else if (selectButtonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                     {
@@ -170,8 +184,11 @@ int menu()
             newWindow.clear();
             newWindow.draw(backgroundSprite2);
             newWindow.draw(button1Sprite);
+
             newWindow.draw(button2Sprite);
+
             newWindow.draw(selectButtonSprite);
+            // newWindow.draw(characterSprite);
             newWindow.display();
         }
         
