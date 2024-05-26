@@ -169,9 +169,10 @@ int menu()
                     {
                         if (!characterTexture.loadFromFile(prefix+playerPrefix+"char_01.png"))
                         {
-                            return 1;
+                            return -1;
                         }
                         std::cout << "ch1 loaded.\n";
+                        num = 1;
                         // sf::Sprite characterSprite(characterTexture);
                         // characterSprite.setPosition(450, 450);
                         // characterSprite.setScale(1.6f, 1.6f);
@@ -182,37 +183,41 @@ int menu()
                     {
                         if (!characterTexture.loadFromFile(prefix+playerPrefix+"char_02.png"))
                         {
-                            return 1;
+                            return -1;
                         }
                         std::cout << "ch2 loaded.\n";
+                        num = 2;
                         // sf::Sprite characterSprite(characterTexture);
                         // characterSprite.setPosition(300, 300);
                         // characterSprite.setScale(1.6f, 1.6f);
                         // newWindow.draw(characterSprite);
                     }
+                    // else if (selectButtonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
+                    // {
+                    //     // Установка флага, что персонаж выбран
+                    //     characterSelected = true;
+
+                    //     // Сохранение имени файла выбранного персонажа
+                    //     if (button1Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
+                    //     {
+                    //         selectedCharacterFile = prefix+playerPrefix+"char_01.png";
+                    //         std::cout << "Chosen 1";
+                    //         num = 1;
+                    //     }
+                    //     else if (button2Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
+                    //     {
+                    //         selectedCharacterFile = prefix+playerPrefix+"char_02.png";
+                    //         std::cout << "Chosen 2";
+                    //         num = 2;
+                    //     }
                     else if (selectButtonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                     {
-                        // Установка флага, что персонаж выбран
-                        characterSelected = true;
-
-                        // Сохранение имени файла выбранного персонажа
-                        if (button1Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
-                        {
-                            selectedCharacterFile = prefix+playerPrefix+"char_01.png";
-                            num = 1;
-                        }
-                        else if (button2Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
-                        {
-                            selectedCharacterFile = prefix+playerPrefix+"char_02.png";
-                            num = 2;
-                        }
-                        else if (selectButtonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
-                        {
-                            window.close();
-                        }
-
-
+                        return num;
+                        window.close();
                     }
+
+
+                    // }
                 }
             }
             window.clear();
