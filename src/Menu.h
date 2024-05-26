@@ -28,14 +28,15 @@ int menu()
 
     sf::Sprite buttonSprite(buttonTexture);
     buttonSprite.setPosition(400, 600);
-    buttonSprite.setScale(1.6f, 1.6f); // Установка размера кнопки
+    buttonSprite.setScale(1.6f , 1.6f); // Установка размера кнопки
 
 
     sf::RenderWindow window(sf::VideoMode(900, 900), "SFML Window");
 
+    bool window2 = false;
 
-    sf::RenderWindow newWindow(sf::VideoMode(900, 900), "Character Selection");
-    newWindow.setVisible(false); 
+
+
 
     sf::Texture button1Texture, button2Texture, selectButtonTexture;
     if (!button1Texture.loadFromFile("button.png") || !button2Texture.loadFromFile("button.png") || !selectButtonTexture.loadFromFile("button.png"))
@@ -45,7 +46,7 @@ int menu()
     }
 
     // Создание объектов Sprite для кнопок в новом окне
-    sf::Sprite button1Sprite(button1Texture), button2Sprite(button2Texture), selectButtonSprite(selectButtonTexture);
+    sf::Sprite button1Sprite(button1Sprite), button2Sprite(button2Texture), selectButtonSprite(selectButtonTexture);
     button1Sprite.setPosition(200, 600);
     button2Sprite.setPosition(450, 600);
     selectButtonSprite.setPosition(700, 600);
@@ -57,85 +58,112 @@ int menu()
 
     sf::Event event;
 
+    sf::RenderWindow newWindow(sf::VideoMode(900, 900), "Character Selection");
+    newWindow.setVisible(false);
+
     // Основной цикл 
-    while (window.isOpen() || newWindow.isOpen())
+    while (window.isOpen())
     {
         // Обработка событий
         while (window.pollEvent(event))
         {
-if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed)
+            {
                 window.close();
+                newWindow.close();
+            }   
             else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
             {
+
                 //  была ли нажата кнопка
                 if (buttonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                 {
                     // Открытие нового окна
+                    std::cout << " here";
+                    
                     newWindow.setVisible(true);
+                    window2 = true;
+
+
                 }
+
             }
+
         }
-
-        while (newWindow.pollEvent(event))
+        while (window2 && newWindow.isOpen())
         {
-            if (event.type == sf::Event::Closed)
+            while (newWindow.pollEvent(event))
             {
-                newWindow.close();
-            }
-            else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
-            {
-                // была ли нажата кнопка переключения персонажа
-                if (button1Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
+                if (event.type == sf::Event::Closed)
                 {
-                    if (!characterTexture.loadFromFile("char_01.png"))
-                    {
-                        return 1;
-                    }
-                    sf::Sprite characterSprite(characterTexture);
-                    characterSprite.setPosition(300, 300);
+                    newWindow.setVisible(false);
+                    window2 = false;
                 }
-                else if (button2Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
-                {
-                    if (!characterTexture.loadFromFile("char_02.png"))
-                    {
-                        return 1;
-                    }
-                    sf::Sprite characterSprite(characterTexture);
-                    characterSprite.setPosition(300, 300);
-                }
-                else if (selectButtonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
-                {
-                    // Установка флага, что персонаж выбран
-                    characterSelected = true;
+               
 
-                    // Сохранение имени файла выбранного персонажа
+
+                else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+                {
+                    std::cout << "!";
+                    // была ли нажата кнопка переключения персонажа
                     if (button1Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                     {
-                        selectedCharacterFile = "char_01.png";
+                        if (!characterTexture.loadFromFile("char_01.png"))
+                        {
+                            return 1;
+                        }
+                        std::cout << "ch1 loaded.\n";
+                        sf::Sprite characterSprite(characterTexture);
+                        characterSprite.setPosition(300, 300);
                     }
                     else if (button2Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
                     {
-                        selectedCharacterFile = "char_02.png";
+                        if (!characterTexture.loadFromFile("char_02.png"))
+                        {
+                            return 1;
+                        }
+                        std::cout << "ch2 loaded.\n";
+                        sf::Sprite characterSprite(characterTexture);
+                        characterSprite.setPosition(300, 300);
                     }
+                    else if (selectButtonSprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
+                    {
+                        // Установка флага, что персонаж выбран
+                        characterSelected = true;
 
-                    newWindow.close();
-                    window.setVisible(true);
+                        // Сохранение имени файла выбранного персонажа
+                        if (button1Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
+                        {
+                            selectedCharacterFile = "char_01.png";
+                        }
+                        else if (button2Sprite.getGlobalBounds().contains(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)))
+                        {
+                            selectedCharacterFile = "char_02.png";
+                        }
 
-                    // Очистка окна
-                    window.clear();
-
-                    // Отрисовка спрайта и кнопки в главном окне
-                    window.draw(backgroundSprite);
-                    window.draw(buttonSprite);
-
-                    // Отображение окна
-                    window.display();
+                    }
                 }
             }
+            newWindow.clear();
+            newWindow.draw(backgroundSprite);
+            newWindow.draw(button1Sprite);
+            newWindow.draw(button2Sprite);
+            newWindow.display();
         }
+        
+        window.clear();
+
+        // Отрисовка спрайта и кнопки в главном окне
+
+        
+        window.draw(backgroundSprite);
+        window.draw(buttonSprite);
+        window.display();
+
     
     }
-    window.close();
+    
+    
         // Возвращаем статус выбора персонажа
     return characterSelected;
     
