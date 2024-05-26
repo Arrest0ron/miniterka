@@ -25,7 +25,7 @@ int menu()
     if (!backgroundTexture.loadFromFile(prefix+background1))
     {
         // Обработка ошибки загрузки изображения
-        return 1;
+        return -1;
     }
 
     // Создание объекта Sprite для фона
@@ -36,7 +36,7 @@ int menu()
     if (!buttonTexture.loadFromFile(prefix+button1))
     {
         
-        return 1;
+        return -1;
     }
 
     sf::Sprite buttonSprite(buttonTexture);
