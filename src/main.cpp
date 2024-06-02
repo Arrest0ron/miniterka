@@ -21,6 +21,7 @@
 
 
 
+
 // bool IsGreaterThenLimitX(sf::Vector2f& movement)
 // {
 //     if (pow(pow(movement.x,2) + pow(movement.y,2)/1.4,0.5) >= MOVEMENTCAP)
