@@ -142,10 +142,24 @@ void Update::Collision(Entity& ent)
     return;
 }
 
-// void Update::TouchLava(Entity& ent)
-// {
-    
-// }
+void Update::TouchLava(Entity& ent)
+{    
+    sf::FloatRect Bounds;
+    Bounds = ent.getGlobalBounds();
+    std::vector<int> EntityCoordinatesInt  = GetEntityCoordinatesInt(Bounds);
+
+    if (tilemap.Tiles[EntityCoordinatesInt[1]][EntityCoordinatesInt[2]].GetTile() == 9)
+
+    {
+        std::cout << "!";
+        ent.AddHealth(-1);
+    }
+    if (tilemap.Tiles[EntityCoordinatesInt[1]][EntityCoordinatesInt[3]].GetTile() == 9)
+    {
+        std::cout << "!";
+        ent.AddHealth(-1);
+    }
+}
 
 void Update::UpdatePlayer(Player& User)
 {

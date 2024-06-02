@@ -10,7 +10,7 @@ FetchContent_Declare(SFML
     GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(CMakeSFMLProject src/main.cpp src/Map.cpp src/Update.cpp src/Handler.cpp src/Blocks.cpp src/AnimationManager.cpp src/Perlin.cpp src/Dynamics.cpp)
+add_executable(CMakeSFMLProject src/main.cpp src/Map.cpp src/Update.cpp src/Handler.cpp src/Blocks.cpp src/AnimationManager.cpp src/Perlin.cpp src/Dynamics.cpp src/Menu.cpp)
 
 
 

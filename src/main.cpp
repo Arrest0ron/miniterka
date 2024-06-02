@@ -32,6 +32,7 @@
 
 int main()
 {
+    
     int num = menu();
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
     int GLOBAL_SEED = time(0);
@@ -147,12 +148,12 @@ int main()
     try
     {
         
-        // tilemap.RandomWalkSurface();
-        // tilemap.PerlinHights("Stone");
-        // tilemap.PerlinCaves("Diamond");
-        // tilemap.PerlinCaves("Redstone");
-        // tilemap.LiquidStripe("WaterUnder",2.9f,2.f,0.5);
-        // tilemap.LiquidStripe("Lava",1.2f,1.3f,0.3);
+        tilemap.RandomWalkSurface();
+        tilemap.PerlinHights("Stone");
+        tilemap.PerlinCaves("Diamond");
+        tilemap.PerlinCaves("Redstone");
+        tilemap.LiquidStripe("WaterUnder",2.9f,2.f,0.5);
+        tilemap.LiquidStripe("Lava",1.2f,1.3f,0.3);
         tilemap.Walls();
         
     }
@@ -339,6 +340,15 @@ int main()
         // Тайлы и дебаг отрисовка
 
         Tile** TileArray = tilemap.ReturnTiles();
+
+        if (User.GetHealth()<=0)
+        {
+            float userY = tilemap.GetSurfaceHeight(MAP_LENGTH/2)*tileSize-User.GetModelHeight();
+            float userX = MAP_LENGTH/2*tileSize;
+            User.setPosition(sf::Vector2f(userX,  userY));
+            User.SetHealth(100);
+            User.SetScore(100);
+        }
         
 
         MAP.resize((LoadedYU - LoadedYD)*(LoadedXL-LoadedXR)*4);
@@ -396,6 +406,8 @@ int main()
         // Обработка событий
         sf::Event event;
         int LeftMouseFlag = 0;
+
+        
 
         
         

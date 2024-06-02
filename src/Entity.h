@@ -127,6 +127,10 @@ public:
     {
         this->Health += AddedHealth;
     }
+    void SetHealth(int Health)
+    {
+        this->Health = Health;
+    }
 
     friend EntityStack;
 };
