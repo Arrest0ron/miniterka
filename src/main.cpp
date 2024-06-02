@@ -35,7 +35,7 @@ int main()
     int num = menu();
     // Установка семечка генерации как ключа для генерации всех случайных переменных.
     int GLOBAL_SEED = time(0);
-    // int GLOBAL_SEED = 1710959590;
+    //int GLOBAL_SEED = 1710959590;
     srand(GLOBAL_SEED);
 
     
