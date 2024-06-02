@@ -20,17 +20,6 @@
 #include "settings.h"
 
 
-
-
-// bool IsGreaterThenLimitX(sf::Vector2f& movement)
-// {
-//     if (pow(pow(movement.x,2) + pow(movement.y,2)/1.4,0.5) >= MOVEMENTCAP)
-//     {
-//         return 1;
-//     }
-//     return 0;
-// }
-
 int main()
 {
     
