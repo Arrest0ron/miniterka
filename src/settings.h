@@ -4,8 +4,8 @@
 int const TILESET_SIZE = 32;
 int TILESET_X = 32;
 int tileSize = 16; // Размер каждого тайла
-const int MAP_HEIGHT = 75;
-const int MAP_LENGTH = 75;
+const int MAP_HEIGHT = 750;
+const int MAP_LENGTH = 750;
 
 const int SEALEVEL = MAP_HEIGHT / 2;
 const float MOVEMENTCAP = 8.0f;
